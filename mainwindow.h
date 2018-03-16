@@ -11,12 +11,18 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
 #include "ui_mainwindow.h"
+
+#include <QToolBar>
 #include <QImage>
 #include <QTreeView>
 #include <QStandardItem>
 #include <QStandardItemModel>
 
 #include <QGraphicsPixmapItem>
+
+#include <QPoint>
+#include <QToolBar>
+ #include <QRectF>
 
 #include <QDebug>
 #include <QFile>
@@ -75,9 +81,15 @@ private:
 	QStandardItemModel *model;
 	
 	Ui::MainWindowClass ui;
+	
+	///<summary>
+	///工具栏
+	///</summary>
+	QToolBar *pToolBar;
+
 	QString fileName;//读入图像文件的文件名
 
-	QLabel *label;
+	//QLabel *label;
 	QScrollArea *scrollArea ;
 
 	QTreeView *treeView;
@@ -98,7 +110,9 @@ private:
 
 private slots:
 	void openFileSlot();
-	//void treeItemChanged(QTreeWidgetItem* item,int column);
+	
+	//工具栏-图像漫游的槽
+	void panPicSlot();
 };
 
 #endif // MAINWINDOW_H

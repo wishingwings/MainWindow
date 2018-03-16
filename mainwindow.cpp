@@ -8,22 +8,25 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
-	//InitTree(); //初始化左边的树控件
-	//treeview->show();
 	
-	//ui.menuBar->addAction(openAction);
+	QToolBar *pToolBar=addToolBar(tr("&File"));
+	
+	
 	QObject::connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openFileSlot()));
     //QObject::connect(ui.treeWidget,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(treeItemChanged(QTreeWidgetItem*,int)));
 	
 	//ShowTree(fileName,nBandCount);
 	
-	
+	QObject::connect(ui.PanAction,SIGNAL(triggered()),this,SLOT(panPicSlot()));
 }
 
 MainWindow::~MainWindow()
 {
 	
 }
+
+
+
 
 void MainWindow::openFileSlot()
 {
@@ -80,17 +83,35 @@ void MainWindow::openFileSlot()
 		//获取影像数据类型
 		poBand=poDataset->GetRasterBand(1);
 		poBand -> GetRasterDataType();
+				
+		//获得显示图像的GraphicsView实际尺寸
+	    int widthGraphicsView=ui.graphicsView->size().width();
+		int heightGraphicsView=ui.graphicsView->size().height();
+
+
+
 		int bytePerLine = (width * 24 + 31 )/ 8;  
 		unsigned char* allBandUC = new unsigned char[bytePerLine * height];  
 
-		QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,bytePerLine,QImage::Format_RGB888)));
+		//int y=ui.graphicsView->y();
+		//QPoint GlobalPoint=(graphicsView->mapToGlobal(QPoint(0, 0)));//获取控件在窗体中的坐标
+		//int x = GlobalPoint.x();
+		//int y = GlobalPoint.y(); 
+
+		//unsigned char* allBandUC = new unsigned char[width* height];  
+
+		
+		poBand ->RasterIO(GF_Read,0,0, width, height,allBandUC, width, height, GDT_Byte, 0, 0);
+
+		QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,QImage::Format_RGB888)));
+
+		//QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,bytePerLine,QImage::Format_RGB888)));
 		
 		//将item添加至场景中
 		QGraphicsScene *pScene=new QGraphicsScene();
 		pScene->addItem(pItem);
 
-		//为视图设置场景
-		
+		//为视图设置场景		
 		QGraphicsView *graphicsView=new QGraphicsView ();
 		ui.graphicsView->setScene(pScene);
 			
@@ -98,7 +119,7 @@ void MainWindow::openFileSlot()
 		qDebug()<<"pic height is"<<img->height();
 
 		//ShowImg(imgBand);
-		ui.label->setPixmap(QPixmap::fromImage(*img));
+		//ui.label->setPixmap(QPixmap::fromImage(*img));
 		//ui.label->setPixmap(QPixmap::fromImage(*img));
 		ShowTree(fileName,nBandCount);
 			
@@ -130,6 +151,14 @@ void MainWindow::InitTree()
 		QStringList(QString("num_3")));
 	items3->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 	items3->setCheckState(0,Qt::Unchecked); //初始状态没有被选中
+
+
+}
+
+
+void MainWindow::panPicSlot()
+
+{
 
 
 }

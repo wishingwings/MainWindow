@@ -37,9 +37,20 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string/>
+       <widget class="QGraphicsView" name="graphicsView">
+        <property name="maximumSize">
+         <size>
+          <width>637</width>
+          <height>667</height>
+         </size>
+        </property>
+        <property name="sceneRect">
+         <rectf>
+          <x>0.000000000000000</x>
+          <y>0.000000000000000</y>
+          <width>0.000000000000000</width>
+          <height>0.000000000000000</height>
+         </rectf>
         </property>
        </widget>
       </item>
@@ -71,16 +82,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QGraphicsView" name="graphicsView">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>470</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -106,11 +107,20 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="PanAction"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="openAction">
    <property name="text">
     <string>打开图像(&amp;O)</string>
+   </property>
+  </action>
+  <action name="PanAction">
+   <property name="text">
+    <string>新建</string>
+   </property>
+   <property name="toolTip">
+    <string>图像漫游</string>
    </property>
   </action>
  </widget>

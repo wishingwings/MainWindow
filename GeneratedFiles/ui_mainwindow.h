@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue Mar 13 20:08:50 2018
+** Created: Thu Mar 15 19:16:29 2018
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -17,7 +17,6 @@
 #include <QtGui/QGraphicsView>
 #include <QtGui/QGridLayout>
 #include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenu>
 #include <QtGui/QMenuBar>
@@ -34,14 +33,14 @@ class Ui_MainWindowClass
 {
 public:
     QAction *openAction;
+    QAction *PanAction;
     QWidget *centralWidget;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
     QGridLayout *gridLayout;
-    QLabel *label;
+    QGraphicsView *graphicsView;
     QTreeWidget *treeWidget;
     QTreeView *treeView;
-    QGraphicsView *graphicsView;
     QMenuBar *menuBar;
     QMenu *menu;
     QToolBar *mainToolBar;
@@ -54,6 +53,8 @@ public:
         MainWindowClass->resize(1015, 827);
         openAction = new QAction(MainWindowClass);
         openAction->setObjectName(QString::fromUtf8("openAction"));
+        PanAction = new QAction(MainWindowClass);
+        PanAction->setObjectName(QString::fromUtf8("PanAction"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         scrollArea = new QScrollArea(centralWidget);
@@ -67,10 +68,12 @@ public:
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        label = new QLabel(scrollAreaWidgetContents);
-        label->setObjectName(QString::fromUtf8("label"));
+        graphicsView = new QGraphicsView(scrollAreaWidgetContents);
+        graphicsView->setObjectName(QString::fromUtf8("graphicsView"));
+        graphicsView->setMaximumSize(QSize(637, 667));
+        graphicsView->setSceneRect(QRectF(0, 0, 0, 0));
 
-        gridLayout->addWidget(label, 0, 0, 1, 1);
+        gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
 
         scrollArea->setWidget(scrollAreaWidgetContents);
         treeWidget = new QTreeWidget(centralWidget);
@@ -82,9 +85,6 @@ public:
         treeView = new QTreeView(centralWidget);
         treeView->setObjectName(QString::fromUtf8("treeView"));
         treeView->setGeometry(QRect(10, 160, 256, 291));
-        graphicsView = new QGraphicsView(centralWidget);
-        graphicsView->setObjectName(QString::fromUtf8("graphicsView"));
-        graphicsView->setGeometry(QRect(10, 470, 256, 192));
         MainWindowClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindowClass);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -101,6 +101,7 @@ public:
 
         menuBar->addAction(menu->menuAction());
         menu->addAction(openAction);
+        mainToolBar->addAction(PanAction);
 
         retranslateUi(MainWindowClass);
 
@@ -111,7 +112,10 @@ public:
     {
         MainWindowClass->setWindowTitle(QApplication::translate("MainWindowClass", "MainWindow", 0, QApplication::UnicodeUTF8));
         openAction->setText(QApplication::translate("MainWindowClass", "\346\211\223\345\274\200\345\233\276\345\203\217(&O)", 0, QApplication::UnicodeUTF8));
-        label->setText(QString());
+        PanAction->setText(QApplication::translate("MainWindowClass", "\346\226\260\345\273\272", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        PanAction->setToolTip(QApplication::translate("MainWindowClass", "\345\233\276\345\203\217\346\274\253\346\270\270", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
         menu->setTitle(QApplication::translate("MainWindowClass", "\346\226\207\344\273\266", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
