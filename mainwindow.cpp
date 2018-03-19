@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "ImgOperation.h"
 #include "gdal.h"
 #include "gdal_priv.h"
 
@@ -32,7 +33,7 @@ void MainWindow::openFileSlot()
 {
 	qDebug()<<"fileName is";
 	//get file name
-	QString fileName=QFileDialog::getOpenFileName(this,"Open File",QDir::currentPath()); // 在mainwindow.h已定义
+	fileName=QFileDialog::getOpenFileName(this,"Open File",QDir::currentPath()); // 在mainwindow.h已定义
 	qDebug()<<"fileName is"<<fileName;
 
 	if(fileName.isEmpty())
@@ -108,11 +109,11 @@ void MainWindow::openFileSlot()
 		//QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,bytePerLine,QImage::Format_RGB888)));
 		
 		//将item添加至场景中
-		QGraphicsScene *pScene=new QGraphicsScene();
+		QGraphicsScene *pScene=new QGraphicsScene(this);
 		pScene->addItem(pItem);
 
-		//为视图设置场景		
-		QGraphicsView *graphicsView=new QGraphicsView ();
+		//为视图设置场景
+		QGraphicsView *graphicsView=new QGraphicsView (this);
 		ui.graphicsView->setScene(pScene);
 			
 		qDebug()<<"pic width is"<<img->width();
@@ -122,6 +123,7 @@ void MainWindow::openFileSlot()
 		//ui.label->setPixmap(QPixmap::fromImage(*img));
 		//ui.label->setPixmap(QPixmap::fromImage(*img));
 		ShowTree(fileName,nBandCount);
+		
 			
 
 	}
@@ -159,6 +161,55 @@ void MainWindow::InitTree()
 void MainWindow::panPicSlot()
 
 {
+	//判断是否已经有图像载入
+	if(fileName.isEmpty())
+	{
+
+		QMessageBox::information(this,"Error Message","Please select a file");
+		return;
+	}
+	QCursor cursor;
+
+}
+
+//增加按下鼠标事件处理函数
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+	if(event->button()==Qt::LeftButton)
+
+	{
+		QCursor cursor;
+		cursor.setShape(Qt::ClosedHandCursor);
+		QApplication::setOverrideCursor(cursor);
+		x0=event->x();//鼠标起始位置
+		
+		if (graphicsView==NULL)
+		{
+			return;
+		}
+		ui.graphicsView->setDragMode(QGraphicsView::ScrollHandDrag); 
+		
+
+		//this->setDragMode(QGraphicsView::ScrollHandDrag );  
+		//this->setInteractive( false );  
+		//lastEventCursorPos = event->pos();  
+
+	}
+
+
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+	if (graphicsView->dragMode() ==QGraphicsView::ScrollHandDrag)
+	{
+		QPoint temp;
+		int x1;
+		x1=event->x();//鼠标移动后的位置
+		int dx=x1-x0;
+		graphicsView->horizontalScrollBar()->setValue(graphicsView->horizontalScrollBar()->value()+dx);
+
+	}
 
 
 }

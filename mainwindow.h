@@ -10,6 +10,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
+
 #include "ui_mainwindow.h"
 
 #include <QToolBar>
@@ -17,6 +18,10 @@
 #include <QTreeView>
 #include <QStandardItem>
 #include <QStandardItemModel>
+#include <QCursor>
+#include <QMouseEvent>
+
+#include <QScrollBar>
 
 #include <QGraphicsPixmapItem>
 
@@ -50,6 +55,12 @@ public:
 	~MainWindow();
 
 private:
+	///</summary>
+	///鼠标初始x坐标
+	///</summary>
+	int x0;
+
+	
 	///<summary>
 	///图像数据集
 	///</summary>
@@ -87,6 +98,11 @@ private:
 	///</summary>
 	QToolBar *pToolBar;
 
+	///<summary>
+	///光标对象
+	///</summary>
+	QCursor cursior;
+
 	QString fileName;//读入图像文件的文件名
 
 	//QLabel *label;
@@ -106,6 +122,11 @@ private:
 	void ReadImg(const QString filename);
 
 	void ShowBand(GDALRasterBand* band );  
+
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+
+
 	
 
 private slots:

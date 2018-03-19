@@ -1,16 +1,13 @@
-﻿生成启动时间为 3/15/2018 7:22:18 PM。
+﻿生成启动时间为 3/19/2018 3:46:54 PM。
      1>项目“D:\Study\VC++_project\ShowImage\MainWindow\MainWindow\MainWindow.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
          正在创建“Debug\MainWindow.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
        CustomBuild:
-         Moc'ing mainwindow.h...
-         Qt: Untested Windows version 6.2 detected!
+         所有输出均为最新。
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I. /ID:\Install\QT4.8\include /I.\GeneratedFiles\Debug /ID:\Install\QT4.8\include\QtCore /ID:\Install\QT4.8\include\QtGui /Zi /nologo /W1 /WX- /Od /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_DLL /D QT_CORE_LIB /D QT_GUI_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt GeneratedFiles\Debug\moc_mainwindow.cpp main.cpp mainwindow.cpp
-         moc_mainwindow.cpp
-         main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I. /ID:\Install\QT4.8\include /I.\GeneratedFiles\Debug /ID:\Install\QT4.8\include\QtCore /ID:\Install\QT4.8\include\QtGui /Zi /nologo /W1 /WX- /Od /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_DLL /D QT_CORE_LIB /D QT_GUI_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt mainwindow.cpp
          mainwindow.cpp
-         正在生成代码...
+     1>d:\study\vc++_project\showimage\mainwindow\mainwindow\ImgOperation.h(9): warning C4067: 预处理器指令后有意外标记 - 应输入换行符
          所有输出均为最新。
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\\MainWindow.exe" /NOLOGO /LIBPATH:D:\Install\QT4.8\lib qtmaind.lib QtCored4.lib QtGuid4.lib gdal_i.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\MainWindow.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.lib" /MACHINE:X86 Debug\moc_mainwindow.obj
@@ -29,4 +26,4 @@
 
 生成成功。
 
-已用时间 00:00:03.49
+已用时间 00:00:01.55
