@@ -125,6 +125,9 @@ private:
 
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);//鼠标按键释放事件
+	void wheelEvent(QWheelEvent *event); // 滚轮事件
+
 
 
 	
@@ -134,6 +137,9 @@ private slots:
 	
 	//工具栏-图像漫游的槽
 	void panPicSlot();
+
+	//工具栏-图像放大的槽
+	void MagnifyActionSlot();
 };
 
 #endif // MAINWINDOW_H

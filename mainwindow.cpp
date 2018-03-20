@@ -19,6 +19,10 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	//ShowTree(fileName,nBandCount);
 	
 	QObject::connect(ui.PanAction,SIGNAL(triggered()),this,SLOT(panPicSlot()));
+
+	QObject::connect(ui.MagnifyAction,SIGNAL(triggered()),this,SLOT(MagnifyActionSlot()));
+
+
 }
 
 MainWindow::~MainWindow()
@@ -158,6 +162,40 @@ void MainWindow::InitTree()
 }
 
 
+void MainWindow::MagnifyActionSlot()
+
+{
+	//判断是否已经有图像载入
+	if(fileName.isEmpty())
+	{
+
+		QMessageBox::information(this,"Error Message","Please select a file");
+		return;
+	}
+	
+}
+
+//<summary>  
+///鼠标滚轮事件，实现图像缩放  
+///</summary>  
+///<param name="event">滚轮事件</param>  
+
+void MainWindow::wheelEvent(QWheelEvent *event)
+
+{
+	if (event->delta()>0)
+	{
+		//ZoomIn();
+	}
+	if (event->delta()<0)
+	{
+		//ZoomOut();
+	}
+
+
+}
+
+
 void MainWindow::panPicSlot()
 
 {
@@ -168,10 +206,8 @@ void MainWindow::panPicSlot()
 		QMessageBox::information(this,"Error Message","Please select a file");
 		return;
 	}
-	QCursor cursor;
 
 }
-
 //增加按下鼠标事件处理函数
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
@@ -198,6 +234,15 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
 
 }
+
+void MainWindow::mouseReleaseEvent( QMouseEvent *event )  
+{  
+	if ( event->button() == Qt::LeftButton)  
+	{  
+		ui.graphicsView->setDragMode(QGraphicsView::NoDrag); 
+
+	}  
+}  
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {
