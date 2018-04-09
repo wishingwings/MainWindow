@@ -25,7 +25,7 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>300</width>
+        <width>400</width>
         <height>0</height>
        </size>
       </property>
@@ -41,10 +41,15 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>300</width>
+        <width>400</width>
         <height>0</height>
        </size>
       </property>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
      </widget>
     </item>
     <item row="0" column="1" rowspan="2">
@@ -57,7 +62,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>684</width>
+         <width>584</width>
          <height>727</height>
         </rect>
        </property>
@@ -120,6 +125,7 @@
    <addaction name="PanAction"/>
    <addaction name="MagnifyAction"/>
    <addaction name="ReductionAction"/>
+   <addaction name="NewROIAction"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="openAction">
@@ -157,6 +163,14 @@
    </property>
    <property name="toolTip">
     <string>图像缩小</string>
+   </property>
+  </action>
+  <action name="NewROIAction">
+   <property name="text">
+    <string>新建ROI</string>
+   </property>
+   <property name="toolTip">
+    <string>选择ROI</string>
    </property>
   </action>
  </widget>

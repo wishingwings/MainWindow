@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Tue Mar 20 15:25:35 2018
+** Created: Sun Apr 8 23:32:41 2018
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,24 +23,34 @@ static const uint qt_meta_data_MainWindow[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       9,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       2,       // signalCount
+
+ // signals: signature, parameters, type, tag, flags
+      12,   11,   11,   11, 0x05,
+      22,   11,   11,   11, 0x05,
 
  // slots: signature, parameters, type, tag, flags
-      12,   11,   11,   11, 0x08,
-      27,   11,   11,   11, 0x08,
-      40,   11,   11,   11, 0x08,
+      33,   11,   11,   11, 0x08,
+      48,   11,   11,   11, 0x08,
+      61,   11,   11,   11, 0x08,
+      81,   11,   11,   11, 0x08,
+     100,   11,   11,   11, 0x08,
+     112,   11,   11,   11, 0x08,
+     125,   11,   11,   11, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_MainWindow[] = {
-    "MainWindow\0\0openFileSlot()\0panPicSlot()\0"
-    "MagnifyActionSlot()\0"
+    "MainWindow\0\0clicked()\0released()\0"
+    "openFileSlot()\0panPicSlot()\0"
+    "MagnifyActionSlot()\0NewROIActionSlot()\0"
+    "isPressed()\0isReleased()\0mousePressEventSlot()\0"
 };
 
 void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -49,9 +59,15 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_ASSERT(staticMetaObject.cast(_o));
         MainWindow *_t = static_cast<MainWindow *>(_o);
         switch (_id) {
-        case 0: _t->openFileSlot(); break;
-        case 1: _t->panPicSlot(); break;
-        case 2: _t->MagnifyActionSlot(); break;
+        case 0: _t->clicked(); break;
+        case 1: _t->released(); break;
+        case 2: _t->openFileSlot(); break;
+        case 3: _t->panPicSlot(); break;
+        case 4: _t->MagnifyActionSlot(); break;
+        case 5: _t->NewROIActionSlot(); break;
+        case 6: _t->isPressed(); break;
+        case 7: _t->isReleased(); break;
+        case 8: _t->mousePressEventSlot(); break;
         default: ;
         }
     }
@@ -90,10 +106,22 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 9;
     }
     return _id;
+}
+
+// SIGNAL 0
+void MainWindow::clicked()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, 0);
+}
+
+// SIGNAL 1
+void MainWindow::released()
+{
+    QMetaObject::activate(this, &staticMetaObject, 1, 0);
 }
 QT_END_MOC_NAMESPACE

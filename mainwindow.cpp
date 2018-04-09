@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ImgOperation.h"
+
 #include "gdal.h"
 #include "gdal_priv.h"
 
@@ -9,29 +9,124 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
+	strList=new QStringList();
+	Rect *rect = new Rect(); 
 	
-	QToolBar *pToolBar=addToolBar(tr("&File"));
-	
-	
-	QObject::connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openFileSlot()));
-    //QObject::connect(ui.treeWidget,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(treeItemChanged(QTreeWidgetItem*,int)));
-	
-	//ShowTree(fileName,nBandCount);
-	
-	QObject::connect(ui.PanAction,SIGNAL(triggered()),this,SLOT(panPicSlot()));
 
+	//int x=currentPos.x();
+		/*int y=currentPos.y();
+		const QRectF *rect=new QRectF (currentPos,QSizeF(100,100));
+		qDebug()<<"createrect"<<endl;
+		QGraphicsRectItem *item_rect=new QGraphicsRectItem();
+		item_rect->setRect(QRectF (currentPos,QSizeF(0,0)));*/
+		
+
+	myScene=new MyScene(this);
+	
+	myScene->addItem(rect);
+
+	//为视图设置场景
+	//QGraphicsView *graphicsView=new QGraphicsView (this);
+	//ui.graphicsView->setScene(pScene);
+	ui.graphicsView->setScene(myScene);
+
+
+	
+	//ui.graphicsView->setMouseTracking(true);
+	
+	//ui.centralWidget->setMouseTracking(true);
+   //MainWindow::setMouseTracking(true);
+	
+	setWindowState(Qt::WindowMaximized);//使得窗口最大化
+	
+	//解决中文显示乱码问题
+	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+	QTextCodec::setCodecForTr(codec);
+	QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
+	QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
+	//解决中文显示乱码问题
+
+	QToolBar *pToolBar=addToolBar(tr("&File"));
+		
+	QObject::connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openFileSlot()));
+   	
+	QObject::connect(ui.PanAction,SIGNAL(triggered()),this,SLOT(panPicSlot()));
+		
 	QObject::connect(ui.MagnifyAction,SIGNAL(triggered()),this,SLOT(MagnifyActionSlot()));
 
+	QObject::connect(ui.NewROIAction,SIGNAL(triggered()),this,SLOT(NewROIActionSlot()));
 
+	QObject::connect(this,SIGNAL(clicked()),this,SLOT(mousePressEventSlot()));
+
+	QObject::connect(rect,SIGNAL(itemIsPressed()),this,SLOT(isPressed()));  //FIXME
+	QObject::connect(rect,SIGNAL(itemIsReleased()),this,SLOT(isReleased()));//FIXME
+
+
+	//QObject::connect(this,SIGNAL(RectMouseIsPressed()),this,SLOT(mousePressEventSlot()));
+
+	//QObject::connect(this,SIGNAL(released()),this,SLOT(mouseReleaseEvent()));
+
+		
 }
 
 MainWindow::~MainWindow()
 {
 	
 }
+void MainWindow::resizeEvent() 
+{
+	ui.graphicsView->size();
+	int widthGraphicsView=ui.graphicsView->size().width();
+	int heightGraphicsView=ui.graphicsView->size().height();
+
+}
+
+void MainWindow::ReadImgInfo(QString fileName)
+{
+
+	if ( fileName == "" || poDataset== NULL )  
+	{  
+		return;  
+	}  
+
+	 int row = 0; // 用来记录数据模型的行号 
+
+	 // 图像的格式信息  
+	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "Description" ) ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem( poDataset->GetDriver()->GetDescription() ) );  
+	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "Meta Infor") ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem( poDataset->GetDriver()->GetMetadataItem( GDAL_DMD_LONGNAME) ) ) ;  
+	 imgMetaModel->setItem( row, 0, new QStandardItem(tr("Data Type") ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem(GDALGetDataTypeName( ( poDataset->GetRasterBand( 1)->GetRasterDataType() ) ) ) );  
+
+	 // 图像的大小和波段个数  
+	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "X Size" ) ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem( QString::number( poDataset->GetRasterXSize() ) ) );  
+	 imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Y Size" ) ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem( QString::number( poDataset->GetRasterYSize() ) ) );  
+	 imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Band Count" ) ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem( QString::number( poDataset->GetRasterCount() ) ) );  
+
+	 // 图像的投影信息  
+	 imgMetaModel->setItem( row, 0, new QStandardItem( tr( "Projection" ) ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem( poDataset->GetProjectionRef() ) );  
+
+	 // 图像的坐标和分辨率信息  
+	 double adfGeoTransform[6];  
+	 QString origin = "";  
+	 QString pixelSize = "";  
+	 if( poDataset->GetGeoTransform(adfGeoTransform ) == CE_None )  
+	 {  
+		 origin = QString::number(adfGeoTransform[0] ) + "," + QString::number( adfGeoTransform[3] );  
+		 pixelSize = QString::number(adfGeoTransform[1] ) + "," + QString::number( adfGeoTransform[5] );  
+	 }  
+	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "Origin" ) ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem(origin ) );  
+	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "Pixel Size" ) ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem(pixelSize ) );  
 
 
-
+}
 
 void MainWindow::openFileSlot()
 {
@@ -43,14 +138,14 @@ void MainWindow::openFileSlot()
 	if(fileName.isEmpty())
 	{
 
-		QMessageBox::information(this,"Error Message","Please select a file");
+		QMessageBox::information(this,"提示","请选择需要打开的文件");
 		return;
 	}
 
 
 	else
 	{
-		QImage *img=new QImage;
+		/*QImage *img=new QImage;
 		
 		if(! ( img->load(fileName) ) ) //加载图像
 		{
@@ -59,80 +154,94 @@ void MainWindow::openFileSlot()
 				tr("打开图像失败!"));
 			delete img;
 			return;
-		}
+		}*/
 
-		GDALAllRegister();         //利用GDAL读取图片，先要进行注册  
-
-		//CPLSetConfigOption("GDAL_FILENAME_IS_UTF8","NO");   //设置支持中文路径  
-
-		GDALDataset *poDataset;
-
-		GDALRasterBand  *poBand;
-		GDALAllRegister();
-		
-		QByteArray ba=fileName.toLatin1();
-		char *mm=ba.data();
-		qDebug()<<mm<<endl;
-
-		poDataset=(GDALDataset*)GDALOpen(mm,GA_ReadOnly);
-
-		//获取图像的大小
-		int width=poDataset->GetRasterXSize();    
-		int height=poDataset->GetRasterYSize();     
-		
-
-		//获取图像的波段数
-		int nBandCount=poDataset->GetRasterCount();
-		qDebug()<<nBandCount<<endl;	
-
-		//获取影像数据类型
-		poBand=poDataset->GetRasterBand(1);
-		poBand -> GetRasterDataType();
-				
-		//获得显示图像的GraphicsView实际尺寸
-	    int widthGraphicsView=ui.graphicsView->size().width();
-		int heightGraphicsView=ui.graphicsView->size().height();
-
-
-
-		int bytePerLine = (width * 24 + 31 )/ 8;  
-		unsigned char* allBandUC = new unsigned char[bytePerLine * height];  
-
-		//int y=ui.graphicsView->y();
-		//QPoint GlobalPoint=(graphicsView->mapToGlobal(QPoint(0, 0)));//获取控件在窗体中的坐标
-		//int x = GlobalPoint.x();
-		//int y = GlobalPoint.y(); 
-
-		//unsigned char* allBandUC = new unsigned char[width* height];  
-
-		
-		poBand ->RasterIO(GF_Read,0,0, width, height,allBandUC, width, height, GDT_Byte, 0, 0);
-
-		QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,QImage::Format_RGB888)));
-
-		//QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,bytePerLine,QImage::Format_RGB888)));
-		
-		//将item添加至场景中
-		QGraphicsScene *pScene=new QGraphicsScene(this);
-		pScene->addItem(pItem);
-
-		//为视图设置场景
-		QGraphicsView *graphicsView=new QGraphicsView (this);
-		ui.graphicsView->setScene(pScene);
-			
-		qDebug()<<"pic width is"<<img->width();
-		qDebug()<<"pic height is"<<img->height();
-
-		//ShowImg(imgBand);
-		//ui.label->setPixmap(QPixmap::fromImage(*img));
-		//ui.label->setPixmap(QPixmap::fromImage(*img));
+		ReadImg(fileName);
+		//ReadImgInfo(fileName);
 		ShowTree(fileName,nBandCount);
-		
-			
+
+	
+					
 
 	}
 
 }
+
+void MainWindow::ReadImg(QString fileName)
+
+{
+	GDALAllRegister();         //利用GDAL读取图片，先要进行注册  
+
+	//CPLSetConfigOption("GDAL_FILENAME_IS_UTF8","NO");   //设置支持中文路径  
+
+	GDALDataset *poDataset;
+
+	GDALRasterBand  *poBand;
+	
+
+	QByteArray ba=fileName.toLatin1();
+	char *mm=ba.data();
+	qDebug()<<mm<<endl;
+
+	poDataset=(GDALDataset*)GDALOpen(mm,GA_ReadOnly);
+
+	
+		
+	//获取图像的大小
+	int width=poDataset->GetRasterXSize();    
+	int height=poDataset->GetRasterYSize();     
+
+
+	//获取图像的波段数
+	nBandCount=poDataset->GetRasterCount();
+	qDebug()<<nBandCount<<endl;	
+
+	//获取影像数据类型
+	poBand=poDataset->GetRasterBand(1);
+	poBand -> GetRasterDataType();
+
+
+	// 图像的坐标和分辨率信息  
+	double adfGeoTransform[6];  
+	QString origin = "";  
+	QString pixelSize = "";
+	poDataset->GetGeoTransform(adfGeoTransform);
+
+	if( poDataset->GetGeoTransform(adfGeoTransform ) == CE_None )  
+	{  
+		poDataset->GetGeoTransform(adfGeoTransform);
+	}
+
+	//获得显示图像的GraphicsView实际尺寸
+	int widthGraphicsView=ui.graphicsView->size().width();
+	int heightGraphicsView=ui.graphicsView->size().height();
+	 
+
+	int bytePerLine = (width * 8 + 31 )/ 32*4;  
+	unsigned char* allBandUC = new unsigned char[bytePerLine * height]; 
+
+	
+	poBand ->RasterIO(GF_Read,0,0, width, height,allBandUC ,width, height, GDT_Byte, 0, 0);
+
+	pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,width,height,QImage::Format_Indexed8)));
+	
+
+	//QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,bytePerLine,QImage::Format_RGB888)));
+
+	//将item添加至场景中
+	//pScene=new QGraphicsScene(this);
+	//pScene->addItem(pItem);
+	myScene->addItem(pItem);
+
+	//为视图设置场景
+	//QGraphicsView *graphicsView=new QGraphicsView (this);
+	//ui.graphicsView->setScene(pScene);
+	ui.graphicsView->setScene(myScene);
+
+	
+	
+}
+
 void MainWindow::InitTree()
 
 {
@@ -161,81 +270,259 @@ void MainWindow::InitTree()
 
 }
 
-
-void MainWindow::MagnifyActionSlot()
+//<summary>  
+///获取动作名称 (为了方便区分，后续的鼠标在GraphicsView中连续左键操作，来自哪个对象发出的信号)
+///</summary>  
+///
+void MainWindow::getActionName()
 
 {
-	//判断是否已经有图像载入
-	if(fileName.isEmpty())
-	{
-
-		QMessageBox::information(this,"Error Message","Please select a file");
-		return;
-	}
 	
-}
+	QAction *act=(QAction*) sender();//获取发出动作的对象
+	QString actName=act->objectName();//获取发出动作对象的名字：这里为MagnifyAction
+	
+	
+	strList->append(actName);
+
+	
+};
 
 //<summary>  
-///鼠标滚轮事件，实现图像缩放  
+///工具栏上 实现图像平移槽
 ///</summary>  
-///<param name="event">滚轮事件</param>  
-
-void MainWindow::wheelEvent(QWheelEvent *event)
-
-{
-	if (event->delta()>0)
-	{
-		//ZoomIn();
-	}
-	if (event->delta()<0)
-	{
-		//ZoomOut();
-	}
-
-
-}
-
-
+///<param name="event">鼠标左键事件</param
 void MainWindow::panPicSlot()
 
 {
 	//判断是否已经有图像载入
 	if(fileName.isEmpty())
 	{
+		QMessageBox::information(this,"Error Message","Please select a file");
+		return;
+	}
+	
+	getActionName();
 
+}
+
+//<summary>  
+///工具栏上 实现图像放大槽 
+///</summary>  
+///<param name="event">鼠标左键事件</param>  
+void MainWindow::MagnifyActionSlot()
+
+{
+	//判断是否已经有图像载入
+	if(fileName.isEmpty())
+	{
 		QMessageBox::information(this,"Error Message","Please select a file");
 		return;
 	}
 
+	getActionName();
+	ui.graphicsView->setDragMode(QGraphicsView::NoDrag); 
+
+	cursor.setShape(Qt::ArrowCursor);	
+			
 }
+
+//<summary>  
+///工具栏上 实现图像选择ROI槽
+///</summary>  
+
+void MainWindow::NewROIActionSlot()
+
+{
+	//判断是否已经有图像载入
+	if(fileName.isEmpty())
+	{
+		QMessageBox::information(this,"提示","请选择需要打开的文件");
+		return;
+	}
+
+	getActionName();
+
+
+
+}
+
 //增加按下鼠标事件处理函数
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-	if(event->button()==Qt::LeftButton)
-
+	//strList=new QStringList();
+	//找到scrollArea在屏幕的上的矩形的位置，给出了矩形的左上角点的坐标
+	QRect *rect=new QRect(ui.scrollArea->pos()+ui.centralWidget->pos(),ui.scrollArea->size());
+	
+	currentPos = event->pos();
+	qDebug()<<"mousePressEvent"<<endl;
+	if ( rect->contains(currentPos))//如果鼠标的点在scrollArea的矩形范围内，则发出信号
 	{
-		QCursor cursor;
+		emit clicked();
+	}
+	
+	else
+	{
+		return;
+	}
+}
+
+//<summary>  
+///工具栏在Graphicsview上按下鼠标左键响应事件
+///</summary>  
+///<param name="event">鼠标左键事件</param> 
+void MainWindow::mousePressEventSlot()
+{
+	mouseGrabber();
+	//strList的初始化操作在mousePressEventSlot()
+	if (strList->size()==0)
+	{
+		QMessageBox::information(this,"Error Message","请继续您的操作");
+	}
+	ui.graphicsView->setDragMode(QGraphicsView::NoDrag); 
+
+	cursor.setShape(Qt::ArrowCursor);	
+	QString temp="";
+	if (strList->count()==0)
+	{
+		return;
+	}
+
+	if (strList->count()>0)
+	{
+		int nstrList=strList->count();
+		temp=strList->at(nstrList-1);
+	}
+	
+	if (temp=="PanAction")
+	{
 		cursor.setShape(Qt::ClosedHandCursor);
-		QApplication::setOverrideCursor(cursor);
-		x0=event->x();//鼠标起始位置
-		
-		if (graphicsView==NULL)
-		{
-			return;
-		}
 		ui.graphicsView->setDragMode(QGraphicsView::ScrollHandDrag); 
+			
+	}
+	
+	
+	if (temp=="MagnifyAction")
+	{
+		
+		double dScalefactor=1.2;
+
+		matrix.scale(dScalefactor,dScalefactor);  
+		
+		pItem->setMatrix(matrix);
+
+		ui.graphicsView->show();
+
+	}
+
+	if (temp=="NewROIAction")//如果是新建ROI
+	{
+		
+		qDebug()<<"NewROIActon"<<endl;
+		//emit(RectMouseIsPressed());
+		
+		
+		/*int x=currentPos.x();
+		int y=currentPos.y();
+		const QRectF *rect=new QRectF (currentPos,QSizeF(100,100));
+		qDebug()<<"createrect"<<endl;
+		QGraphicsRectItem *item_rect=new QGraphicsRectItem();
+		item_rect->setRect(QRectF (currentPos,QSizeF(0,0)));*/
 		
 
-		//this->setDragMode(QGraphicsView::ScrollHandDrag );  
-		//this->setInteractive( false );  
-		//lastEventCursorPos = event->pos();  
-
+		
+		//pScene->addItem(item_rect);
+		//qDebug()<<"Scene added item"<<endl;
+		//ui.graphicsView->setScene(pScene);*/
+		
+		//mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+	
 	}
 
 
 }
 
-void MainWindow::mouseReleaseEvent( QMouseEvent *event )  
+void MainWindow::isPressed()
+{
+	qDebug()<<"ItemIsclicked in MainWindow"<<endl;
+}
+//槽，当rect鼠标释放时执行
+//应当设置标志位，让UI图片停止对鼠标拖动事件的响应
+void MainWindow::isReleased()
+{
+	qDebug()<<"ItemIsRelease in MainWindow"<<endl;
+}
+void MainWindow::mouseReleaseEvent(QMouseEvent * event)
+{
+	releaseMouse();
+/*int x=currentPos.x();
+		int y=currentPos.y();
+		const QRectF *rect=new QRectF (currentPos,QSizeF(100,100));
+		qDebug()<<"createrect"<<endl;
+		QGraphicsRectItem *item_rect=new QGraphicsRectItem();
+		item_rect->setRect(QRectF (currentPos,QSizeF(0,0)));*/
+			qDebug()<<"mouseReleaseEvent"<<endl;
+	//strList=new QStringList();
+	//找到scrollArea在屏幕的上的矩形的位置，给出了矩形的左上角点的坐标
+	QRect *rect=new QRect(ui.scrollArea->pos()+ui.centralWidget->pos(),ui.scrollArea->size());
+
+	currentPos = event->pos();
+	
+	if ( rect->contains(currentPos))//如果鼠标的点在scrollArea的矩形范围内，则发出信号
+	{
+		emit released();
+	}
+
+	else
+	{
+		return;
+	}
+	
+}
+/*void MainWindow::mouseReleaseEventSlot()
+{
+	qDebug()<<"mouseReleaseEvent"<<endl;
+	
+	//strList的初始化操作在mousePressEventSlot()
+	//if (strList->size()==0)
+	//{
+		//QMessageBox::information(this,"Error Message","请继续您的操作");
+	//}
+	/*ui.graphicsView->setDragMode(QGraphicsView::NoDrag); 
+
+	cursor.setShape(Qt::ArrowCursor);	
+	QString temp="";
+	if (strList->count()==0)
+	{
+		return;
+	}
+
+	if (strList->count()>0)
+	{
+		int nstrList=strList->count();
+		temp=strList->at(nstrList-1);
+	}
+
+	if (temp=="PanAction")
+	{
+		cursor.setShape(Qt::ClosedHandCursor);
+		ui.graphicsView->setDragMode(QGraphicsView::ScrollHandDrag); 
+
+	}
+}*/
+
+/*void MainWindow::paintEvent(QPaintEvent * event)
+{
+	paint=new QPainter;
+	paint->begin(this);
+	paint->setPen(QPen(Qt::blue,4,Qt::DashLine));//设置画笔形式 
+	paint->setBrush(QBrush(Qt::red,Qt::SolidPattern));//设置画刷形式 
+	paint->drawRect(20,20,160,160);
+	paint->end();
+
+}*/
+
+
+/*void MainWindow::mouseReleaseEvent( QMouseEvent *event )  
 {  
 	if ( event->button() == Qt::LeftButton)  
 	{  
@@ -257,7 +544,73 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
 	}
 
 
-}
+}*/
+
+//<summary>  
+///窗口事件过滤器 
+///</summary>  
+///<param name="obj">控件对象</param>  
+///<param name="event">控件事件</param>  
+/*bool MainWindow::eventFilter(QObject *obj,QEvent *event)
+{
+	if (obj==ui.PanAction)//如果是图像平移操作
+
+	{
+		qDebug()<<"Pan"<<endl;
+		QMouseEvent *mouseEvent=static_cast<QMouseEvent *>(event);
+		if(mouseEvent->button()==Qt::LeftButton)
+		{
+			
+			QCursor cursor;
+			cursor.setShape(Qt::ClosedHandCursor);
+			QApplication::setOverrideCursor(cursor);
+			x0=mouseEvent->x();//鼠标起始位置
+		
+			if (graphicsView==NULL)
+			{
+				return false;
+			}
+			ui.graphicsView->setDragMode(QGraphicsView::ScrollHandDrag); 
+
+			return false; 
+		}
+
+		
+	}
+	else 	if (obj==ui.MagnifyAction)
+	{
+			{
+				qDebug()<<"Mag"<<endl;
+				QMouseEvent *mouseEvent=static_cast<QMouseEvent *>(event);
+				//if(mouseEvent->type()==QEvent::MouseButtonPress)
+				if(mouseEvent->button()==Qt::LeftButton)
+				{
+				//x0=mouseEvent->x();//
+				//y0=mouseEvent->y();
+
+				//为视图设置场景
+				QGraphicsView *graphicsView=new QGraphicsView (this);
+
+				QMatrix matrix;  
+				double dScalefactor=1.5;
+
+				matrix.scale(dScalefactor,dScalefactor);  
+				pItem->setMatrix(matrix);
+
+				ui.graphicsView->show();
+				return false;
+				}
+
+			}
+		
+		
+	}
+		else return QMainWindow::eventFilter(obj,event);
+	
+	}*/
+	
+
+
 
 /*void MainWindow::treeItemChanged(QTreeWidgetItem* item,int column)
 {

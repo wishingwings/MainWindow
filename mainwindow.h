@@ -10,24 +10,36 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
-
-#include "ui_mainwindow.h"
-
-#include <QToolBar>
+#include <QCursor>
 #include <QImage>
+#include <QList>
+#include "rect.h"
+#include "ui_mainwindow.h"
+#include "myscene.h"
+
+#include <QPainter>
+
+#include <QTextCodec>
+#include <QToolBar>
+
 #include <QTreeView>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QCursor>
+
 #include <QMouseEvent>
 
 #include <QScrollBar>
 
 #include <QGraphicsPixmapItem>
+#include <QGraphicsSceneEvent>
+ #include <QGraphicsSceneMouseEvent>
+
+#include <QPainter>
 
 #include <QPoint>
 #include <QToolBar>
- #include <QRectF>
+#include <QRectF>
+#include <QRect>
 
 #include <QDebug>
 #include <QFile>
@@ -60,6 +72,11 @@ private:
 	///</summary>
 	int x0;
 
+	///</summary>
+	///鼠标初始y坐标
+	///</summary>
+	int y0;
+
 	
 	///<summary>
 	///图像数据集
@@ -90,18 +107,47 @@ private:
 	///树列表数据模型
 	///</summary>
 	QStandardItemModel *model;
-	
+
+		
 	Ui::MainWindowClass ui;
 	
 	///<summary>
 	///工具栏
 	///</summary>
 	QToolBar *pToolBar;
+	///<summary>
+	///事件过滤器对象
+	///</summary>
+	QObject *obj;
 
 	///<summary>
-	///光标对象
+	///点对象 记录鼠标在Graphicsview选择ROI的起始点和最后的点
 	///</summary>
-	QCursor cursior;
+	QPoint  currentPos;
+	QPoint  endPos;
+
+
+	///<summary>
+	///用于记录Toolbar上点击的Action的ActionName :记录需要后续在graphicview上进行操作的Action，需要是QStringList
+	///方便Clcked()事件判断，这个Action是哪个对象发出的
+    ///例如：图像放大，图像缩小，图像1：1显示
+	///</summary>
+	QStringList *strList;
+	
+	///<summary>
+	///Matrix
+	///用于graphicsview的放大或缩小的Matrix
+	///</summary>
+
+	QMatrix matrix; 
+
+
+	QPainter *paint;
+	///<summary>
+	///光标对象
+	///用于graphicsview的光标
+	///</summary>
+	QCursor cursor;
 
 	QString fileName;//读入图像文件的文件名
 
@@ -111,25 +157,45 @@ private:
 	QTreeView *treeView;
 
 	QAction *openAction;
+	QAction *PanAction;
+	QAction *MagnifyAction;
+	QAction *NewROIAction;
 
+	QGraphicsScene *pScene;
+	MyScene *myScene;
 	QGraphicsView *graphicsView;
+	QGraphicsRectItem *item_rect;	
+	QGraphicsPixmapItem *pItem;
+
+	/// <summary>  
+	/// 图像元数据模型  
+	/// </summary>  
+	QStandardItemModel *imgMetaModel;  
 	
 	void InitTree();//初始化左侧树
 
-	void ShowImg(QList <GDALRasterBand*> *imgBand);   
+	//void ShowImg(QList <GDALRasterBand*> *imgBand);   
 	void ShowTree(const QString filename,int nBandCount);
 
-	void ReadImg(const QString filename);
+	void ReadImg(const QString filename);//读出图像
+
+	void ReadImgInfo(const QString filename);//读出图像基本信息
 
 	void ShowBand(GDALRasterBand* band );  
-
+		
 	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);//鼠标按键释放事件
-	void wheelEvent(QWheelEvent *event); // 滚轮事件
 
+	void mouseReleaseEvent(QMouseEvent *event);
 
+	//void paintEvent(QPaintEvent *event);
+	
+	void getActionName(); //获取ActionName
 
+	void resizeEvent();
+signals:
+	void clicked();
+	void released();//绘制ROI，鼠标左键放开
+	//void RectMouseIsPressed();
 	
 
 private slots:
@@ -140,6 +206,15 @@ private slots:
 
 	//工具栏-图像放大的槽
 	void MagnifyActionSlot();
+
+	//工具栏-新建ROI的槽
+	void NewROIActionSlot();
+
+	void isPressed();
+	void isReleased();
+	virtual void mousePressEventSlot();
+
+	//virtual void mouseReleaseEventSlot();
 };
 
 #endif // MAINWINDOW_H

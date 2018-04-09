@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue Mar 20 15:47:30 2018
+** Created: Tue Apr 3 22:14:54 2018
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -37,6 +37,7 @@ public:
     QAction *NewAction;
     QAction *MagnifyAction;
     QAction *ReductionAction;
+    QAction *NewROIAction;
     QWidget *centralWidget;
     QGridLayout *gridLayout_2;
     QTreeView *treeView;
@@ -65,6 +66,8 @@ public:
         MagnifyAction->setObjectName(QString::fromUtf8("MagnifyAction"));
         ReductionAction = new QAction(MainWindowClass);
         ReductionAction->setObjectName(QString::fromUtf8("ReductionAction"));
+        NewROIAction = new QAction(MainWindowClass);
+        NewROIAction->setObjectName(QString::fromUtf8("NewROIAction"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         gridLayout_2 = new QGridLayout(centralWidget);
@@ -78,15 +81,18 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(treeView->sizePolicy().hasHeightForWidth());
         treeView->setSizePolicy(sizePolicy);
-        treeView->setMinimumSize(QSize(300, 0));
+        treeView->setMinimumSize(QSize(400, 0));
 
         gridLayout_2->addWidget(treeView, 1, 0, 1, 1);
 
         treeWidget = new QTreeWidget(centralWidget);
+        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
+        treeWidget->setHeaderItem(__qtreewidgetitem);
         treeWidget->setObjectName(QString::fromUtf8("treeWidget"));
         sizePolicy.setHeightForWidth(treeWidget->sizePolicy().hasHeightForWidth());
         treeWidget->setSizePolicy(sizePolicy);
-        treeWidget->setMinimumSize(QSize(300, 0));
+        treeWidget->setMinimumSize(QSize(400, 0));
 
         gridLayout_2->addWidget(treeWidget, 0, 0, 1, 1);
 
@@ -95,7 +101,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 684, 727));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 584, 727));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -136,6 +142,7 @@ public:
         mainToolBar->addAction(PanAction);
         mainToolBar->addAction(MagnifyAction);
         mainToolBar->addAction(ReductionAction);
+        mainToolBar->addAction(NewROIAction);
 
         retranslateUi(MainWindowClass);
 
@@ -161,6 +168,10 @@ public:
         ReductionAction->setText(QApplication::translate("MainWindowClass", "\347\274\251\345\260\217", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
         ReductionAction->setToolTip(QApplication::translate("MainWindowClass", "\345\233\276\345\203\217\347\274\251\345\260\217", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
+        NewROIAction->setText(QApplication::translate("MainWindowClass", "\346\226\260\345\273\272ROI", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        NewROIAction->setToolTip(QApplication::translate("MainWindowClass", "\351\200\211\346\213\251ROI", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
         menu->setTitle(QApplication::translate("MainWindowClass", "\346\226\207\344\273\266", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
