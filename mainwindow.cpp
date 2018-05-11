@@ -1,44 +1,73 @@
 #include "mainwindow.h"
-
+#include "MyScene.h" //为了引用全局变量QList ROILists
+#include "rect.h"
 #include "gdal.h"
 #include "gdal_priv.h"
 
+//接收的变量
+static double dGeoPosX; //MyScene中鼠标所在点的地理坐标X 初始化
+static double dGeoPosY; //MyScene中鼠标所在点的地理坐标Y 初始化
 
+static int distX;//MyScene鼠标移动的X值
+static int distY;//MyScene鼠标移动的X值
+
+static double ROIscaleFactor;  //MyScene 绘制ROI时候图像的缩放比例
+
+static QList<QGraphicsRectItem*> *ROILists;//初始化*ROILists
+//发出的变量
+
+QString MainWindow::fileName=""; //myScene.cpp中需要使用载入图像的名字
+QString  MainWindow::operationName="";//myScene.cpp中需要使用操作栏最后一个操作的名字
+QPoint  MainWindow::pitem1TL;
+float MainWindow::scaleFactor;
+
+int MainWindow::vScrollBarNow; //QGrphicsView 垂直滚动条现在的位置  myScene需要确定ROI左上角点移动的位置
+
+int MainWindow::hScrollBarNow; //QGrphicsView 水平滚动条现在的位置  myScene需要确定ROI左上角点移动的位置
+QGraphicsItemGroup MainWindow::*itemGroup;
+ 
 
 MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
+	
 	ui.setupUi(this);
-	strList=new QStringList();
-	Rect *rect = new Rect(); 
+	setWindowState(Qt::WindowMaximized);//使得窗口最大化
+	//计算显示图像的区域
+
+	vScrollBarNow=ui.graphicsView->verticalScrollBar()->value();
+	hScrollBarNow=2;
+	iZoomIn=0;
+	scaleFactor=1.000000;//默认图像放大倍数为1
+	
+	vScrollBar=ui.graphicsView->verticalScrollBar();
+	hScrollBar=ui.graphicsView->horizontalScrollBar();
+	vScrollBar->setTracking(true);
+	
+	
+	timer=new QTimer(this);
+	timer->start(1000); // 每次发射timeout信号时间间隔为1秒
 	
 
-	//int x=currentPos.x();
-		/*int y=currentPos.y();
-		const QRectF *rect=new QRectF (currentPos,QSizeF(100,100));
-		qDebug()<<"createrect"<<endl;
-		QGraphicsRectItem *item_rect=new QGraphicsRectItem();
-		item_rect->setRect(QRectF (currentPos,QSizeF(0,0)));*/
-		
-
+	fileName="";
+	strList=new QStringList();
 	myScene=new MyScene(this);
 	
-	myScene->addItem(rect);
+	qDebug()<<myScene->sceneRect()<<endl;
+	
+	 LabelGeoXY = new QLabel(this);
 
+	
 	//为视图设置场景
-	//QGraphicsView *graphicsView=new QGraphicsView (this);
-	//ui.graphicsView->setScene(pScene);
+	
 	ui.graphicsView->setScene(myScene);
 
-
-	
 	//ui.graphicsView->setMouseTracking(true);
-	
+	ui.scrollArea->setMouseTracking(true);
 	//ui.centralWidget->setMouseTracking(true);
-   //MainWindow::setMouseTracking(true);
-	
-	setWindowState(Qt::WindowMaximized);//使得窗口最大化
-	
+	//ui.scrollAreaWidgetContents->setMouseTracking(true);
+	MainWindow::setMouseTracking(true);
+		
 	//解决中文显示乱码问题
 	QTextCodec *codec = QTextCodec::codecForName("UTF-8");
 	QTextCodec::setCodecForTr(codec);
@@ -55,17 +84,27 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	QObject::connect(ui.MagnifyAction,SIGNAL(triggered()),this,SLOT(MagnifyActionSlot()));
 
 	QObject::connect(ui.NewROIAction,SIGNAL(triggered()),this,SLOT(NewROIActionSlot()));
+	
+	QObject::connect(ui.DeleteROIAction,SIGNAL(triggered()),this,SLOT(DeleteROIActionSlot()));
 
 	QObject::connect(this,SIGNAL(clicked()),this,SLOT(mousePressEventSlot()));
 
-	QObject::connect(rect,SIGNAL(itemIsPressed()),this,SLOT(isPressed()));  //FIXME
-	QObject::connect(rect,SIGNAL(itemIsReleased()),this,SLOT(isReleased()));//FIXME
+	QObject::connect(timer,SIGNAL(timeout()),this,SLOT(timeUpdate()));
+
+	QObject::connect(vScrollBar,SIGNAL(valueChanged(int)),this,SLOT(VerticalScrollBarValueChangedSlot(int)));
+
+	QObject::connect(hScrollBar,SIGNAL(valueChanged(int)),this,SLOT(HorizontalScrollBarValueChangedSlot(int)));
+
+	//QObject::connect(myScene,SIGNAL(sendData(int X,int Y)), this, SLOT(ReceiveDataSlot(int X,int Y)));
+	//QObject::connect(this,SIGNAL(sliderPressed()),this,SLOT(valueChangedSlot(int)));
+
+	//QObject::connect(rect,SIGNAL(itemIsPressed()),this,SLOT(isPressed()));  //FIXME
+	//QObject::connect(rect,SIGNAL(itemIsReleased()),this,SLOT(isReleased()));//FIXME
 
 
 	//QObject::connect(this,SIGNAL(RectMouseIsPressed()),this,SLOT(mousePressEventSlot()));
 
 	//QObject::connect(this,SIGNAL(released()),this,SLOT(mouseReleaseEvent()));
-
 		
 }
 
@@ -73,6 +112,8 @@ MainWindow::~MainWindow()
 {
 	
 }
+
+
 void MainWindow::resizeEvent() 
 {
 	ui.graphicsView->size();
@@ -88,8 +129,8 @@ void MainWindow::ReadImgInfo(QString fileName)
 	{  
 		return;  
 	}  
-
-	 int row = 0; // 用来记录数据模型的行号 
+	
+	 /*int row = 0; // 用来记录数据模型的行号 
 
 	 // 图像的格式信息  
 	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "Description" ) ) );  
@@ -123,8 +164,199 @@ void MainWindow::ReadImgInfo(QString fileName)
 	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "Origin" ) ) );  
 	 imgMetaModel->setItem( row++, 1, new QStandardItem(origin ) );  
 	 imgMetaModel->setItem( row, 0, new QStandardItem(tr( "Pixel Size" ) ) );  
-	 imgMetaModel->setItem( row++, 1, new QStandardItem(pixelSize ) );  
+	 imgMetaModel->setItem( row++, 1, new QStandardItem(pixelSize ) );  */
 
+
+}
+
+
+//<summary>  
+///QGraphicsView 垂直滚动条发生变化，触发的事件
+///</summary>  
+///<param name="value">滚动条变化的数值</param>  
+
+void MainWindow::VerticalScrollBarValueChangedSlot(int value)
+{
+	qDebug()<<"verticalScrollBar value changed"<<endl;
+	qDebug()<<"changeint factValue"<<endl;
+	
+	vScrollBarNow=value;
+	//目前垂直滚动条的数值记录在变量中
+	int temp=hScrollBarNow;
+	if(fileName.isEmpty())
+	{
+		return;
+	}
+	else
+	{
+		int vBarHeight = ui.graphicsView->verticalScrollBar()->height();//垂直滚动条高度
+		int vBarValueRange=height-vBarHeight;//滚动条滑动的最大距离=图像的高度-滚动条的高度
+		
+		if (vScrollBarNow==vBarValueRange) //如果滑动的范围==滚动条最大移动距离 说明滚动条已经到最大位置
+		{
+			return;
+		}
+		else
+		{
+			
+			 GDALRasterBand  *poBand1;
+			 myScene->removeItem(pItem1);
+			 myScene->removeItem(pItem);
+			 qDebug()<<"scene item count"<<myScene->items().count();
+			//myScene->itemGroup->removeFromGroup(pItem1);
+		     //pItem1->clearFocus();
+			//int y=ui.graphicsView->verticalScrollBar()->pos().y();
+			//int vBarValue=ui.graphicsView->verticalScrollBar()->value();
+			int vBarMaxValue=ui.graphicsView->verticalScrollBar()->maximum();//这个值就等于 滚动条最大移动距离-滚动条高度
+		
+			int bytePerLine = int((widthGraphicsView * 8 + 31 )/ 32*4);  
+			unsigned char* allBandUC = new unsigned char[bytePerLine * heightGraphicsView]; 
+			poBand1=poDataset->GetRasterBand(1);
+			
+			int widthFact=int(widthGraphicsView/scaleFactor);
+			int heightFact=int(heightGraphicsView/scaleFactor);
+
+			int x=int(hScrollBarNow/scaleFactor);
+			int y=int(value/scaleFactor);
+
+			poBand1->RasterIO(GF_Read,hScrollBarNow,value,widthGraphicsView,heightGraphicsView,allBandUC,widthGraphicsView,heightGraphicsView, GDT_Byte,0,0);
+			pItem1=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8)));
+
+			pItem1->setPos(hScrollBarNow,value);//设置新建item1的左上角点
+			//pItem1->scale(scaleFactor,scaleFactor);
+			qDebug()<<"pItem1 height"<<pItem1->boundingRect().height();
+			qDebug()<<"pItem1 width"<<pItem1->boundingRect().width();
+			qDebug()<<"pitem1 rect TL"<<pItem1->sceneBoundingRect().topLeft();
+			qDebug()<<"pitem1 rect TR"<<pItem1->sceneBoundingRect().topRight();
+			qDebug()<<"pitem1 rect BL"<<pItem1->sceneBoundingRect().bottomLeft();
+			qDebug()<<"pitem1 rect BR"<<pItem1->sceneBoundingRect().bottomRight();
+			pItem1->setMatrix(currMatrix);
+
+		      qDebug()<<"pItem1 height"<<pItem1->boundingRect().height();
+		      qDebug()<<"pItem1 width"<<pItem1->boundingRect().width();
+			  qDebug()<<"pitem1 rect TL"<<pItem1->sceneBoundingRect().topLeft();
+			  qDebug()<<"pitem1 rect TR"<<pItem1->sceneBoundingRect().topRight();
+			  qDebug()<<"pitem1 rect BL"<<pItem1->sceneBoundingRect().bottomLeft();
+			  qDebug()<<"pitem1 rect BR"<<pItem1->sceneBoundingRect().bottomRight();
+			/*QImage img=QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8);
+			
+				
+			qDebug()<<"pixmap height"<<img.height();
+			qDebug()<<"pixmap width"<<img.width();
+			
+			QPixmap redrawPixmap(widthGraphicsView,heightGraphicsView);
+
+			QPainter painter(&redrawPixmap);
+			painter.drawPixmap(x,y,widthGraphicsView,heightGraphicsView,QPixmap::fromImage(img));
+			painter.end();
+			
+			QGraphicsPixmapItem *pBackImg=new QGraphicsPixmapItem(redrawPixmap);
+			
+			pBackImg->setPos(x,y);	
+			
+			qDebug()<<"pBackImg height"<<pBackImg->boundingRect().height();
+			qDebug()<<"pBackImg width"<<pBackImg->boundingRect().width();
+		
+			pitem1TL.setX(int(hScrollBarNow/scaleFactor));
+			pitem1TL.setY(int(value/scaleFactor));
+			int vBarValuebefore=ui.graphicsView->verticalScrollBar()->height();
+			qDebug()<<"vbar max "<<vBarValuebefore;
+			qDebug()<<"pitem1 rect TL"<<pItem1->sceneBoundingRect().topLeft();
+			qDebug()<<"pitem1 rect TR"<<pItem1->sceneBoundingRect().topRight();
+			qDebug()<<"pitem1 rect BL"<<pItem1->sceneBoundingRect().bottomLeft();
+			qDebug()<<"pitem1 rect BR"<<pItem1->sceneBoundingRect().bottomRight();
+			//currMatrix记录最近的pItem1放大的倍数
+			//pItem1->setMatrix(currMatrix);
+
+			int vBarValue=ui.graphicsView->verticalScrollBar()->height();
+			qDebug()<<"vbar max "<<vBarValue;
+			qDebug()<<"pitem1 rect TL"<<pBackImg->sceneBoundingRect().topLeft();
+			qDebug()<<"pitem1 rect TR"<<pBackImg->sceneBoundingRect().topRight();
+			qDebug()<<"pitem1 rect BL"<<pBackImg->sceneBoundingRect().bottomLeft();
+			qDebug()<<"pitem1 rect BR"<<pBackImg->sceneBoundingRect().bottomRight();*/
+			//增加重绘在MyScene的矩形
+			//QGraphicsRectItem *rectItemRedraw=new QGraphicsRectItem();
+			qDebug()<<"ROILists count"<<myScene->ROILists->count();
+			
+			//把pitem1加入itemGroup
+			//myScene->itemGroup->addToGroup(pItem1);
+			//myScene->addItem(myScene->itemGroup);
+			myScene->addItem(pItem1);
+			
+			qDebug()<<"myScene items count"<<myScene->items().count();
+			
+			if(myScene->ROILists->count()!=0)
+			{
+				for(int i=0;i<myScene->ROILists->count();i++)
+				{
+					myScene->RedrawROI(i);
+					qDebug()<<"myScene items count"<<myScene->items().count();
+									
+					
+				}
+			}
+			
+		
+		
+			qDebug()<<"myScene's including items"<<myScene->items().count();
+			ui.graphicsView->setScene(myScene);
+
+
+	
+		}
+
+	}
+
+}
+
+void MainWindow::HorizontalScrollBarValueChangedSlot(int value)
+{
+	qDebug()<<"HorizontalScrollBar value changed"<<value;
+	qDebug()<<"changed value"<<endl;
+	int temp=vScrollBarNow;
+	hScrollBarNow=value;//目前垂直滚动条的数值记录在变量中
+
+	if(fileName.isEmpty())
+	{
+		return;
+	}
+	else
+	{
+		int hBarWidth = ui.graphicsView->horizontalScrollBar()->width();//水平滚动条宽度
+		int hBarValueRange=width-hBarWidth;
+
+		if (hScrollBarNow==hBarValueRange) //如果滑动的范围==滚动条最大移动距离
+		{
+			return;
+		}
+		else
+		{
+		/*	GDALRasterBand  *poBand1;
+
+			int bytePerLine = (widthGraphicsView * 8 + 31 )/ 32*4;  
+			unsigned char* allBandUC = new unsigned char[bytePerLine * heightGraphicsView]; 
+			poBand1=poDataset->GetRasterBand(1);
+			
+			poBand1 ->RasterIO(GF_Read,value,vScrollBarNow, widthGraphicsView,heightGraphicsView,allBandUC ,widthGraphicsView,heightGraphicsView, GDT_Byte, 0, 0);
+			pItem1=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8)));
+			pItem1->setPos(value,vScrollBarNow);//设置新建item的左上角点
+			myScene->addItem(pItem1);
+			pItem1->setMatrix(currMatrix);
+
+			if(myScene->ROILists->count()!=0)
+			{
+				for(int i=0;i<myScene->ROILists->count();i++)
+				{
+					myScene->RedrawROI(i);
+				}
+			}*/
+
+			qDebug()<<"myScene's including items"<<myScene->items().count();
+			ui.graphicsView->setScene(myScene);
+
+		}
+
+	}
 
 }
 
@@ -137,7 +369,6 @@ void MainWindow::openFileSlot()
 
 	if(fileName.isEmpty())
 	{
-
 		QMessageBox::information(this,"提示","请选择需要打开的文件");
 		return;
 	}
@@ -156,42 +387,42 @@ void MainWindow::openFileSlot()
 			return;
 		}*/
 
-		ReadImg(fileName);
-		//ReadImgInfo(fileName);
+		ReadImg(fileName,0,0);
+		
+		//CalScaleFactor(maxLatitude,minLatitude,maxLongtitude,minLongtitude,widthGraphicsView,heightGraphicsView);
+
 		ShowTree(fileName,nBandCount);
-
-	
-					
-
 	}
 
 }
 
-void MainWindow::ReadImg(QString fileName)
+void MainWindow::ReadImg(QString fileName,int myScenedistX,int myScenedistY)
 
 {
+    myScenedistX=MyScene::distX;
+	myScenedistY=MyScene::distY;
+
+	
 	GDALAllRegister();         //利用GDAL读取图片，先要进行注册  
 
 	//CPLSetConfigOption("GDAL_FILENAME_IS_UTF8","NO");   //设置支持中文路径  
-
-	GDALDataset *poDataset;
+	
 
 	GDALRasterBand  *poBand;
 	
-
 	QByteArray ba=fileName.toLatin1();
 	char *mm=ba.data();
 	qDebug()<<mm<<endl;
 
 	poDataset=(GDALDataset*)GDALOpen(mm,GA_ReadOnly);
-
+	double GT[6];
+	//得到仿射变换模型  
+	poDataset->GetGeoTransform(GT);  
 	
-		
 	//获取图像的大小
-	int width=poDataset->GetRasterXSize();    
-	int height=poDataset->GetRasterYSize();     
-
-
+	width=poDataset->GetRasterXSize();    
+	height=poDataset->GetRasterYSize();     
+	
 	//获取图像的波段数
 	nBandCount=poDataset->GetRasterCount();
 	qDebug()<<nBandCount<<endl;	
@@ -199,7 +430,6 @@ void MainWindow::ReadImg(QString fileName)
 	//获取影像数据类型
 	poBand=poDataset->GetRasterBand(1);
 	poBand -> GetRasterDataType();
-
 
 	// 图像的坐标和分辨率信息  
 	double adfGeoTransform[6];  
@@ -213,62 +443,56 @@ void MainWindow::ReadImg(QString fileName)
 	}
 
 	//获得显示图像的GraphicsView实际尺寸
-	int widthGraphicsView=ui.graphicsView->size().width();
-	int heightGraphicsView=ui.graphicsView->size().height();
+	widthGraphicsView=ui.graphicsView->size().width();
+	heightGraphicsView=ui.graphicsView->size().height();
 	 
-
-	int bytePerLine = (width * 8 + 31 )/ 32*4;  
-	unsigned char* allBandUC = new unsigned char[bytePerLine * height]; 
-
+	//int bytePerLine = (width * 8 + 31 )/ 32*4;  
+	//unsigned char* allBandUC = new unsigned char[bytePerLine * height]; 
+	//每次仅仅载入窗口尺寸大小的图像 2018/04/20
+	int bytePerLine = (widthGraphicsView * 8 + 31 )/ 32*4;  
+	unsigned char* allBandUC = new unsigned char[bytePerLine * heightGraphicsView]; 
 	
-	poBand ->RasterIO(GF_Read,0,0, width, height,allBandUC ,width, height, GDT_Byte, 0, 0);
-
-	pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,width,height,QImage::Format_Indexed8)));
 	
+	poBand->RasterIO(GF_Read,0,0, widthGraphicsView, heightGraphicsView,allBandUC ,widthGraphicsView, heightGraphicsView, GDT_Byte, 0, 0);
 
-	//QGraphicsPixmapItem *pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage (allBandUC,width,height,bytePerLine,QImage::Format_RGB888)));
-
-	//将item添加至场景中
-	//pScene=new QGraphicsScene(this);
-	//pScene->addItem(pItem);
+//	GDALClose(poDataset);
+	pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8)));
+	
+	qDebug()<<"pItem height"<<pItem->boundingRect().height();
+	qDebug()<<"pItem width"<<pItem->boundingRect().width();
+	
+	pItem1=pItem;
+	myScene->setSceneRect(0,0,width,height);//为了使得滚动条显示图像实际的长宽
+		
+	//将item添加至场景
 	myScene->addItem(pItem);
-
 	//为视图设置场景
-	//QGraphicsView *graphicsView=new QGraphicsView (this);
-	//ui.graphicsView->setScene(pScene);
 	ui.graphicsView->setScene(myScene);
+	
 
-	
-	
 }
 
-void MainWindow::InitTree()
-
+//计算图像显示和图像经纬度的比例尺
+double MainWindow::CalScaleFactor(double maxLatitude,double minLatitude,double maxLongtitude,double minLongtitude,int widthGraphicsView,int heightGraphicsView)
 {
-	ui.treeWidget->clear();    //初始化树形控件
-	ui.treeWidget->show();
+	 double HeightScaleFactor;
+	 double WidthScaleFactor;
 
-	//addTreeRoot
-	//ui.treeWidget->setHeaderLabel("tree");
-	//ui.treeWidget->setHeaderHidden(1); // TreeWidget 标题设置 1为隐藏Header标题 0 为显示Header标题
-
-	QTreeWidgetItem *items1 = new QTreeWidgetItem(ui.treeWidget,
-		QStringList(QString("num_1")));
-	items1->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-	items1->setCheckState(0,Qt::Unchecked); //初始状态没有被选中
-
-	QTreeWidgetItem *items2 = new QTreeWidgetItem(items1,
-		QStringList(QString("num_2")));
-	items2->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-	items2->setCheckState(0,Qt::Unchecked); //初始状态没有被选中
-
-	QTreeWidgetItem *items3 = new QTreeWidgetItem(items1,
-		QStringList(QString("num_3")));
-	items3->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-	items3->setCheckState(0,Qt::Unchecked); //初始状态没有被选中
-
-
+	 if (maxLatitude!=0&&minLatitude!=0&&maxLongtitude!=0&&minLongtitude!=0&&widthGraphicsView!=0&&heightGraphicsView!=0)
+	 {
+		 HeightScaleFactor=(maxLongtitude-minLongtitude)/heightGraphicsView;
+		 WidthScaleFactor=(maxLatitude-minLatitude)/widthGraphicsView;
+	 }
+	 if (HeightScaleFactor>WidthScaleFactor)
+	 {
+		 return HeightScaleFactor;
+	 }
+	 else
+	 {
+		 return WidthScaleFactor;
+	 }
 }
+
 
 //<summary>  
 ///获取动作名称 (为了方便区分，后续的鼠标在GraphicsView中连续左键操作，来自哪个对象发出的信号)
@@ -277,20 +501,17 @@ void MainWindow::InitTree()
 void MainWindow::getActionName()
 
 {
-	
 	QAction *act=(QAction*) sender();//获取发出动作的对象
 	QString actName=act->objectName();//获取发出动作对象的名字：这里为MagnifyAction
 	
-	
 	strList->append(actName);
-
 	
 };
 
 //<summary>  
 ///工具栏上 实现图像平移槽
 ///</summary>  
-///<param name="event">鼠标左键事件</param
+///<param name="event">鼠标左键事件</param>
 void MainWindow::panPicSlot()
 
 {
@@ -339,13 +560,32 @@ void MainWindow::NewROIActionSlot()
 		QMessageBox::information(this,"提示","请选择需要打开的文件");
 		return;
 	}
+	ui.graphicsView->setDragMode(QGraphicsView::NoDrag); 
+
+	cursor.setShape(Qt::ArrowCursor);	
+
 
 	getActionName();
 
-
-
 }
 
+//<summary>  
+///工具栏上 实现图像删除ROI槽
+///</summary>  
+
+void MainWindow::DeleteROIActionSlot()
+
+{
+	//判断是否已经有图像载入
+	if(fileName.isEmpty())
+	{
+		QMessageBox::information(this,"提示","请选择需要打开的文件");
+		return;
+	}
+
+	getActionName();
+
+}
 //增加按下鼠标事件处理函数
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
@@ -381,7 +621,7 @@ void MainWindow::mousePressEventSlot()
 	ui.graphicsView->setDragMode(QGraphicsView::NoDrag); 
 
 	cursor.setShape(Qt::ArrowCursor);	
-	QString temp="";
+	operationName=""; //用来存储最后操作的菜单栏对象
 	if (strList->count()==0)
 	{
 		return;
@@ -390,57 +630,131 @@ void MainWindow::mousePressEventSlot()
 	if (strList->count()>0)
 	{
 		int nstrList=strList->count();
-		temp=strList->at(nstrList-1);
+		operationName=strList->at(nstrList-1);
 	}
 	
-	if (temp=="PanAction")
+	if (operationName=="PanAction")
 	{
 		cursor.setShape(Qt::ClosedHandCursor);
 		ui.graphicsView->setDragMode(QGraphicsView::ScrollHandDrag); 
-			
+				
+		mySceneDistX=MyScene::distX;
+		mySceneDistY=MyScene::distY;
+
+		
+	
+		
+		//ReadImg(fileName,mySceneDistX,mySceneDistY);
+		//ui.scrollArea->horizontalScrollBar()->setValue(ui.scrollArea->horizontalScrollBar()->value()+distX);	
 	}
 	
 	
-	if (temp=="MagnifyAction")
+	if (operationName=="MagnifyAction")
 	{
 		
-		double dScalefactor=1.2;
+		if(cursor.shape()==Qt::ClosedHandCursor)
+		{
+			cursor.setShape(Qt::ArrowCursor);
 
-		matrix.scale(dScalefactor,dScalefactor);  
+		}
+		float dScalefactor=2;
+		iZoomIn=iZoomIn+2;
+		qDebug()<<"zoom factor"<<iZoomIn;
+
+
+	    scaleFactor= qPow(dScalefactor, iZoomIn); // 给全局变量 缩放比例数赋值 计算x的y次幂
+
+		matrix.scale(dScalefactor,dScalefactor);
+		//matrix.scale(scaleFactor,scaleFactor);
+
+		qDebug()<<"scaleFactor"<<scaleFactor;
 		
-		pItem->setMatrix(matrix);
+		currMatrix=matrix;//记录显示图像的当前的matrix信息 ，供其他动作使用
+	
+		pItem1->setMatrix(matrix);
 
+		if(myScene->ROILists->count()!=0)
+		{
+			pItem1->setZValue(-1.00000);
+		}
+		
 		ui.graphicsView->show();
+		
+		
+		/*int hh=ui.graphicsView->horizontalScrollBar()->maximum();
+
+		qDebug()<<"horScrollBar"<<ui.graphicsView->horizontalScrollBar()->maximum();
+		qDebug()<<"ver ScrollBar"<<ui.graphicsView->verticalScrollBar()->maximum();
+		int vv=ui.graphicsView->verticalScrollBar()->maximum();
+		// 场景左上角坐标（场景坐标）
+		QPointF p1 = QPointF(myScene->sceneRect().topLeft());
+		qDebug() << "p1:" << p1;
+
+		// 场景左上角对应视图坐标（视图坐标）
+		qDebug() << "view->mapFromScene(p1.x(), p1.y())" << ui.graphicsView->mapFromScene(p1.x(), p1.y());*/
+		
 
 	}
 
-	if (temp=="NewROIAction")//如果是新建ROI
+	if (operationName=="NewROIAction")//新建ROI
 	{
+		
 		
 		qDebug()<<"NewROIActon"<<endl;
-		//emit(RectMouseIsPressed());
-		
-		
-		/*int x=currentPos.x();
-		int y=currentPos.y();
-		const QRectF *rect=new QRectF (currentPos,QSizeF(100,100));
-		qDebug()<<"createrect"<<endl;
-		QGraphicsRectItem *item_rect=new QGraphicsRectItem();
-		item_rect->setRect(QRectF (currentPos,QSizeF(0,0)));*/
-		
-
-		
-		//pScene->addItem(item_rect);
-		//qDebug()<<"Scene added item"<<endl;
-		//ui.graphicsView->setScene(pScene);*/
-		
-		//mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	
 	}
 
+	if (operationName=="DeleteROIAction")//删除ROI
+	{
+		
+		qDebug()<<"DeleteROIActon"<<endl;
+		
+		if (myScene->ROILists->isEmpty())//这里一定要用myScene->ROILists表示哪个类的ROILists
+		{
+			return;
+		}
+		else
+		{
+				qDebug()<<myScene->ROILists->size()<<endl;
+				//Rect *rect=new Rect();
+				//QGraphicsRectItem *tmpItem=new QGraphicsRectItem();
+				//tmpItem=myScene->ROILists->at(0);
+				//rect = qgraphicsitem_cast<Rect*>(myScene->ROILists->at(0));
 
+		}
+	}
+
+	
 }
+//<summary>  
+///图像上的点坐标转化成Scene上的点坐标
+///</summary>  
+///<param name="event">鼠标左键事件</param> 
 
+void MainWindow::ImgPtChangedScenePt()
+{
+	
+
+};
+//<summary>  
+///图像上的点坐标转化成Scene上的点坐标
+///</summary>  
+///<param name="event">鼠标左键事件</param> 
+
+void MainWindow::ScenePtChangedImgPt()
+{
+
+
+};
+
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+	
+	qDebug()<<" MainWindow mousePressEvent"<<endl;
+
+	
+}
 void MainWindow::isPressed()
 {
 	qDebug()<<"ItemIsclicked in MainWindow"<<endl;
@@ -454,12 +768,7 @@ void MainWindow::isReleased()
 void MainWindow::mouseReleaseEvent(QMouseEvent * event)
 {
 	releaseMouse();
-/*int x=currentPos.x();
-		int y=currentPos.y();
-		const QRectF *rect=new QRectF (currentPos,QSizeF(100,100));
-		qDebug()<<"createrect"<<endl;
-		QGraphicsRectItem *item_rect=new QGraphicsRectItem();
-		item_rect->setRect(QRectF (currentPos,QSizeF(0,0)));*/
+
 			qDebug()<<"mouseReleaseEvent"<<endl;
 	//strList=new QStringList();
 	//找到scrollArea在屏幕的上的矩形的位置，给出了矩形的左上角点的坐标
@@ -478,6 +787,21 @@ void MainWindow::mouseReleaseEvent(QMouseEvent * event)
 	}
 	
 }
+
+///<summary>  
+/// 每隔1秒钟定时器发送信号，获取MyScene类中鼠标坐标转成地理坐标 
+///</summary>  
+///<param name=""></param> 
+void MainWindow::timeUpdate()
+{
+	QString sGeoX=QString::number(MyScene::dGeoPosX,'f',4);
+	LabelGeoXY->setText(sGeoX);
+	
+	ui.statusBar->addWidget(LabelGeoXY);
+	
+}
+
+
 /*void MainWindow::mouseReleaseEventSlot()
 {
 	qDebug()<<"mouseReleaseEvent"<<endl;
@@ -551,66 +875,40 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
 ///</summary>  
 ///<param name="obj">控件对象</param>  
 ///<param name="event">控件事件</param>  
-/*bool MainWindow::eventFilter(QObject *obj,QEvent *event)
+bool MainWindow::eventFilter(QObject *obj,QEvent *event)
+
 {
-	if (obj==ui.PanAction)//如果是图像平移操作
+	//
+	//ui.scrollArea->verticalScrollBar()->hasFocus();
+	//if (obj==ui.scrollArea->verticalScrollBar()&&event->type()==QEvent::MouseButtonPress)
+	if (ui.scrollArea->verticalScrollBar()->hasFocus())
 
 	{
-		qDebug()<<"Pan"<<endl;
+		
+		qDebug()<<"scrollArea event eventFilter"<<endl;
 		QMouseEvent *mouseEvent=static_cast<QMouseEvent *>(event);
 		if(mouseEvent->button()==Qt::LeftButton)
 		{
 			
-			QCursor cursor;
-			cursor.setShape(Qt::ClosedHandCursor);
-			QApplication::setOverrideCursor(cursor);
-			x0=mouseEvent->x();//鼠标起始位置
-		
-			if (graphicsView==NULL)
+			if(event->type() == QEvent::MouseButtonPress)
 			{
-				return false;
-			}
-			ui.graphicsView->setDragMode(QGraphicsView::ScrollHandDrag); 
+				//进行事件处理
 
-			return false; 
+				qDebug()<<"scrollArea event mouseButton presss"<<endl;
+			}
+		
 		}
-
+		else 	
+		{
+			return false;
 		
+		
+		}
+			
 	}
-	else 	if (obj==ui.MagnifyAction)
-	{
-			{
-				qDebug()<<"Mag"<<endl;
-				QMouseEvent *mouseEvent=static_cast<QMouseEvent *>(event);
-				//if(mouseEvent->type()==QEvent::MouseButtonPress)
-				if(mouseEvent->button()==Qt::LeftButton)
-				{
-				//x0=mouseEvent->x();//
-				//y0=mouseEvent->y();
+	return QMainWindow::eventFilter(obj,event);
 
-				//为视图设置场景
-				QGraphicsView *graphicsView=new QGraphicsView (this);
-
-				QMatrix matrix;  
-				double dScalefactor=1.5;
-
-				matrix.scale(dScalefactor,dScalefactor);  
-				pItem->setMatrix(matrix);
-
-				ui.graphicsView->show();
-				return false;
-				}
-
-			}
-		
-		
-	}
-		else return QMainWindow::eventFilter(obj,event);
-	
-	}*/
-	
-
-
+}
 
 /*void MainWindow::treeItemChanged(QTreeWidgetItem* item,int column)
 {
@@ -707,6 +1005,8 @@ void  MainWindow::ShowTree(const QString filename,int nBandCount)
 	 ui.treeView->show();
 	
 }
+
+
 ///<summary>  
 /// 读取图像文件  
 ///</summary>  
@@ -835,3 +1135,33 @@ void  MainWindow::ShowTree(const QString filename,int nBandCount)
 
 
 }  */
+
+
+
+void MainWindow::InitTree()
+
+{
+	ui.treeWidget->clear();    //初始化树形控件
+	ui.treeWidget->show();
+
+	//addTreeRoot
+	//ui.treeWidget->setHeaderLabel("tree");
+	//ui.treeWidget->setHeaderHidden(1); // TreeWidget 标题设置 1为隐藏Header标题 0 为显示Header标题
+
+	QTreeWidgetItem *items1 = new QTreeWidgetItem(ui.treeWidget,
+		QStringList(QString("num_1")));
+	items1->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	items1->setCheckState(0,Qt::Unchecked); //初始状态没有被选中
+
+	QTreeWidgetItem *items2 = new QTreeWidgetItem(items1,
+		QStringList(QString("num_2")));
+	items2->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	items2->setCheckState(0,Qt::Unchecked); //初始状态没有被选中
+
+	QTreeWidgetItem *items3 = new QTreeWidgetItem(items1,
+		QStringList(QString("num_3")));
+	items3->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	items3->setCheckState(0,Qt::Unchecked); //初始状态没有被选中
+
+
+}

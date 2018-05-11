@@ -54,6 +54,21 @@
     </item>
     <item row="0" column="1" rowspan="2">
      <widget class="QScrollArea" name="scrollArea">
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -72,14 +87,23 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
+        <item row="0" column="0" rowspan="2">
          <widget class="QGraphicsView" name="graphicsView">
           <property name="maximumSize">
            <size>
             <width>1677215</width>
             <height>1677215</height>
            </size>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
           </property>
           <property name="sceneRect">
            <rectf>
@@ -112,7 +136,13 @@
     </property>
     <addaction name="openAction"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>打开</string>
+    </property>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -126,6 +156,7 @@
    <addaction name="MagnifyAction"/>
    <addaction name="ReductionAction"/>
    <addaction name="NewROIAction"/>
+   <addaction name="DeleteROIAction"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="openAction">
@@ -171,6 +202,14 @@
    </property>
    <property name="toolTip">
     <string>选择ROI</string>
+   </property>
+  </action>
+  <action name="DeleteROIAction">
+   <property name="text">
+    <string>删除ROI</string>
+   </property>
+   <property name="toolTip">
+    <string>删除ROI</string>
    </property>
   </action>
  </widget>

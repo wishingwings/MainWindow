@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'rect.h'
 **
-** Created: Sun Apr 8 21:50:17 2018
+** Created: Wed May 9 11:14:01 2018
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -78,10 +78,8 @@ void *Rect::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_Rect))
         return static_cast<void*>(const_cast< Rect*>(this));
-    if (!strcmp(_clname, "QGraphicsItem"))
-        return static_cast< QGraphicsItem*>(const_cast< Rect*>(this));
-    if (!strcmp(_clname, "com.trolltech.Qt.QGraphicsItem"))
-        return static_cast< QGraphicsItem*>(const_cast< Rect*>(this));
+    if (!strcmp(_clname, "QGraphicsRectItem"))
+        return static_cast< QGraphicsRectItem*>(const_cast< Rect*>(this));
     return QObject::qt_metacast(_clname);
 }
 

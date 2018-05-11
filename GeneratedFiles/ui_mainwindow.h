@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue Apr 3 22:14:54 2018
+** Created: Wed May 9 11:14:01 2018
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -38,6 +38,7 @@ public:
     QAction *MagnifyAction;
     QAction *ReductionAction;
     QAction *NewROIAction;
+    QAction *DeleteROIAction;
     QWidget *centralWidget;
     QGridLayout *gridLayout_2;
     QTreeView *treeView;
@@ -48,6 +49,7 @@ public:
     QGraphicsView *graphicsView;
     QMenuBar *menuBar;
     QMenu *menu;
+    QMenu *menu_2;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -68,6 +70,8 @@ public:
         ReductionAction->setObjectName(QString::fromUtf8("ReductionAction"));
         NewROIAction = new QAction(MainWindowClass);
         NewROIAction->setObjectName(QString::fromUtf8("NewROIAction"));
+        DeleteROIAction = new QAction(MainWindowClass);
+        DeleteROIAction->setObjectName(QString::fromUtf8("DeleteROIAction"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         gridLayout_2 = new QGridLayout(centralWidget);
@@ -98,6 +102,11 @@ public:
 
         scrollArea = new QScrollArea(centralWidget);
         scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
+        scrollArea->setMouseTracking(true);
+        scrollArea->setFocusPolicy(Qt::StrongFocus);
+        scrollArea->setAcceptDrops(true);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
@@ -107,6 +116,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(scrollAreaWidgetContents->sizePolicy().hasHeightForWidth());
         scrollAreaWidgetContents->setSizePolicy(sizePolicy1);
+        scrollAreaWidgetContents->setFocusPolicy(Qt::StrongFocus);
         gridLayout = new QGridLayout(scrollAreaWidgetContents);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
@@ -114,9 +124,11 @@ public:
         graphicsView = new QGraphicsView(scrollAreaWidgetContents);
         graphicsView->setObjectName(QString::fromUtf8("graphicsView"));
         graphicsView->setMaximumSize(QSize(1677215, 1677215));
+        graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         graphicsView->setSceneRect(QRectF(0, 0, 0, 0));
 
-        gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
+        gridLayout->addWidget(graphicsView, 0, 0, 2, 1);
 
         scrollArea->setWidget(scrollAreaWidgetContents);
 
@@ -128,6 +140,8 @@ public:
         menuBar->setGeometry(QRect(0, 0, 1015, 26));
         menu = new QMenu(menuBar);
         menu->setObjectName(QString::fromUtf8("menu"));
+        menu_2 = new QMenu(menuBar);
+        menu_2->setObjectName(QString::fromUtf8("menu_2"));
         MainWindowClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindowClass);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
@@ -137,12 +151,14 @@ public:
         MainWindowClass->setStatusBar(statusBar);
 
         menuBar->addAction(menu->menuAction());
+        menuBar->addAction(menu_2->menuAction());
         menu->addAction(openAction);
         mainToolBar->addAction(NewAction);
         mainToolBar->addAction(PanAction);
         mainToolBar->addAction(MagnifyAction);
         mainToolBar->addAction(ReductionAction);
         mainToolBar->addAction(NewROIAction);
+        mainToolBar->addAction(DeleteROIAction);
 
         retranslateUi(MainWindowClass);
 
@@ -173,7 +189,12 @@ public:
 #ifndef QT_NO_TOOLTIP
         NewROIAction->setToolTip(QApplication::translate("MainWindowClass", "\351\200\211\346\213\251ROI", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
+        DeleteROIAction->setText(QApplication::translate("MainWindowClass", "\345\210\240\351\231\244ROI", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        DeleteROIAction->setToolTip(QApplication::translate("MainWindowClass", "\345\210\240\351\231\244ROI", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
         menu->setTitle(QApplication::translate("MainWindowClass", "\346\226\207\344\273\266", 0, QApplication::UnicodeUTF8));
+        menu_2->setTitle(QApplication::translate("MainWindowClass", "\346\211\223\345\274\200", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };
