@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Paras>
+    <!--工程参数-->
+    <!--卫星信息-->
+    <!--选择卫星-->
+    <ChooseSAT>
+        <value>newvalue1</value>
+        <value>newvalue1</value>
+    </ChooseSAT>
+    <!--星载光谱响应函数-->
+    <SpectralResponseFunction>
+        <value>3x+4y</value>
+        <value>8x+9u</value>
+    </SpectralResponseFunction>
+    <!--卫星信息 END-->
+    <!--机载信息-->
+    <!--选择相机-->
+    <ChooseCamera>
+        <value>Camera_1</value>
+        <value>Camera_2</value>
+    </ChooseCamera>
+    <!--相机信息-->
+    <CameraParas>
+        <!--焦距-->
+        <focus>20</focus>
+        <!--像素大小-->
+        <PixelSize>3</PixelSize>
+        <!--像主点X-->
+        <MainPointX>4</MainPointX>
+        <!--像主点Y-->
+        <MainPointY>5</MainPointY>
+        <!--帧频-->
+        <FrameFrequency>6</FrameFrequency>
+        <!--分辨率-->
+        <ResolutionRatio>7</ResolutionRatio>
+        <!--像元个数-->
+        <NumberofPixel>24</NumberofPixel>
+    </CameraParas>
+    <!--相机信息 END-->
+    <!--畸变参数-->
+    <DistortionParas>
+        <K1>0.3</K1>
+        <K2>0.4</K2>
+        <K3>0.5</K3>
+        <K4>0.5</K4>
+    </DistortionParas>
+    <!--畸变参数 END-->
+    <!--偏心量-->
+    <Eccentricity>
+        <X>3</X>
+        <Y>2</Y>
+        <Z>6</Z>
+    </Eccentricity>
+    <!--偏心量 END-->
+    <!--机载信息 END -->
+    <!--工程参数 END-->
+    <!--飞行相关参数-->
+    <!--测区参数-->
+    <!--测区原点-->
+    <Origin>
+        <longitude>35.4</longitude>
+        <latitude>36.9</latitude>
+        <height>100</height>
+    </Origin>
+    <!--测区原点 END-->
+    <!--地表高程-->
+    <GroundElevation>
+        <result>90</result>
+    </GroundElevation>
+    <!--平均高度 END-->
+    <!--采样距离-->
+    <SamplingDistance>
+        <result>99</result>
+    </SamplingDistance>
+    <!--采样距离 END-->
+    <!--测区角点-->
+    <Points>
+        <!--依次是左上经度，左上纬度，右上经度，右上纬度，右下经度，右下纬度，左下经度，左下纬度-->
+        <LTLon>35.8</LTLon>
+        <LTLat>35.9</LTLat>
+        <RTLon>36.1</RTLon>
+        <RTLat>36.2</RTLat>
+        <RBLon>36.3</RBLon>
+        <RBLat>36.4</RBLat>
+        <LBLon>36.5</LBLon>
+        <LBLat>36.6</LBLat>
+    </Points>
+    <!--测区角点 END-->
+    <!--测区参数 END -->
+    <!--坐标参数 -->
+    <!--坐标系统 -->
+    <CoordinateSystem>
+        <value>GEO34</value>
+        <value>FX56</value>
+        <value>CCC45</value>
+    </CoordinateSystem>
+    <!--坐标系统 END-->
+    <!--高程系统 -->
+    <ElevationSystem>
+        <value>QQ58</value>
+        <value>KK90</value>
+        <value>WW00</value>
+    </ElevationSystem>
+    <!--高程系统 END-->
+    <!--投影方式 -->
+    <ProjectionMethod>
+        <value>94</value>
+        <value>98</value>
+        <value>33</value>
+    </ProjectionMethod>
+    <!--投影方式 END-->
+    <!--坐标参数 END-->
+    <!--大气参数 -->
+    <!--大气模式 -->
+    <AtmosModel>
+        <value></value>
+		<value></value>
+		<value></value>
+		<value></value>
+    </AtmosModel>
+    <!--大气模式 END-->
+    <!--气溶胶类型 -->
+    <AerosolType>
+        <value></value>
+		<value></value>
+		<value></value>
+		<value></value>
+    </AerosolType>
+    <!--气溶胶类型 END -->
+    <!--水汽柱含量-->
+    <WaterVaporColumnContent>
+        <result>0.7</result>
+    </WaterVaporColumnContent>
+    <!--水汽柱含量 END-->
+    <!--气溶胶光学厚度-->
+    <AOD>
+        <result>0.8</result>
+    </AOD>
+    <!--气溶胶光学厚度 END-->
+    <!--大气参数 END -->
+    <!--观测几何 -->
+    <ObservationGeometry>
+        <!--传感器高度 -->
+        <SensorHeight>45</SensorHeight>
+        <!--传感器高度 END -->
+        <!--地表高程-->
+        <SurfaceElevation>58</SurfaceElevation>
+        <!--地表高程 END-->
+        <!--观测方位角-->
+        <ObservationAzimuth>39</ObservationAzimuth>
+        <!--观测方位角 END-->
+        <!--观测日期时间-->
+        <Date>2018-05-22</Date>
+        <Time>15:43:24</Time>
+        <!--观测日期时间 END-->
+    </ObservationGeometry>
+    <!--观测几何 END-->
+    <!--飞行相关参数 END-->
+    <!--处理方法参数 -->
+    <!--特征点提取-->
+    <FeaturePointExtraction1>
+        <!--兴趣窗口1-->
+        <ROIWindow1>35</ROIWindow1>
+        <!--兴趣窗口1 END -->
+        <!--特征点选择1-->
+        <FeaturePointChosen1>223</FeaturePointChosen1>
+        <!--特征点选择1 END-->
+        <!--阈值1-->
+        <Threshold1>33</Threshold1>
+        <!--阈值1 END-->
+        <!--阈值2-->
+        <Threshold2>333</Threshold2>
+        <!--阈值2 END-->
+    </FeaturePointExtraction1>
+    <!--特征点提取 END-->
+    <!--特征点提取算子-->
+    <ExtractionOperator>
+        <value></value>
+		<value></value>
+	</ExtractionOperator>
+    <!--特征点提取算子 END-->
+    <!--不确定性分析-->
+    <!--要素匹配-->
+    <ElementMatch>
+        <!--空间匹配-->
+        <SpaceMatch>kkkk</SpaceMatch>
+        <!--空间匹配 END-->
+        <!--光谱匹配-->
+        <SpectralMatch>lllll</SpectralMatch>
+        <!--光谱匹配 END-->
+        <!--角度差异-->
+        <AngleDiff>mmmm</AngleDiff>
+        <!--角度差异 END-->
+        <!--时间差异-->
+        <TimeDiff>nnnnn</TimeDiff>
+        <!--时间差异 END-->
+    </ElementMatch>
+    <!--要素匹配 END-->
+    <!--机载相机及定标参数-->
+    <CamCalibrationPara>
+        <!--机载实验室辐射定标-->
+        <RAC>racrac</RAC>
+        <!--机载实验室辐射定标 END-->
+        <!--辐射传输模型-->
+        <RadTransferModel>radtrans</RadTransferModel>
+        <!--辐射传输模型 END-->
+        <!--辐射传输模型-->
+        <RadTransferModel>radtrans</RadTransferModel>
+        <!--辐射传输模型 END-->
+        <!--太阳照度模型-->
+        <SolarIrradianceModel>solar</SolarIrradianceModel>
+        <!--太阳照度模型 END-->
+    </CamCalibrationPara>
+    <!--机载相机及定标参数 END-->
+    <!--大气参数-->
+    <AtomsPara>
+        <!--气溶胶光学厚度-->
+        <AOD>3.4</AOD>
+        <!--气溶胶光学厚度 END-->
+        <!--水汽含量-->
+        <WaterContent>4.5</WaterContent>
+        <!--水汽含量 END-->
+        <!--大气模式假定误差-->
+        <AtomsModel>5.6</AtomsModel>
+        <!--大气模式假定误差 END-->
+        <!--气溶胶类型-->
+        <AerosolType>6.8</AerosolType>
+        <!--气溶胶类型 END-->
+    </AtomsPara>
+    <!--大气参数 END-->
+    <!--不确定性分析 END-->
+    <!--处理方法参数 END -->
+</Paras>

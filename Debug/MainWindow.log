@@ -1,21 +1,20 @@
-﻿生成启动时间为 5/11/2018 11:07:20 AM。
+﻿生成启动时间为 5/25/2018 9:44:07 AM。
      1>项目“D:\Study\VC++_project\ShowImage\MainWindow\MainWindow\MainWindow.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
          正在创建“Debug\MainWindow.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
        CustomBuild:
          所有输出均为最新。
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I. /ID:\Install\QT4.8\include /I.\GeneratedFiles\Debug /ID:\Install\QT4.8\include\QtCore /ID:\Install\QT4.8\include\QtGui /Zi /nologo /W1 /WX- /Od /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_DLL /D QT_CORE_LIB /D QT_GUI_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt MyScene.cpp rect.cpp
-         MyScene.cpp
-         rect.cpp
-         正在生成代码...
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I. /ID:\Install\QT4.8\include /I.\GeneratedFiles\Debug /ID:\Install\QT4.8\include\QtCore /ID:\Install\QT4.8\include\QtGui /ID:\Install\QT4.8\include\QtXml /Zi /nologo /W1 /WX- /Od /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_DLL /D QT_CORE_LIB /D QT_GUI_LIB /D QT_XML_LIB /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt XML.cpp
+         XML.cpp
          所有输出均为最新。
        ResourceCompile:
          所有输出均为最新。
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\\MainWindow.exe" /NOLOGO /LIBPATH:D:\Install\QT4.8\lib qtmaind.lib QtCored4.lib QtGuid4.lib gdal_i.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\MainWindow.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.pdb" /SUBSYSTEM:WINDOWS /HEAP:"16000000" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.lib" /MACHINE:X86 Debug\MainWindow.res
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\\MainWindow.exe" /NOLOGO /LIBPATH:D:\Install\QT4.8\lib qtmaind.lib QtCored4.lib QtGuid4.lib gdal_i.lib QtXmld4.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\MainWindow.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.pdb" /SUBSYSTEM:WINDOWS /HEAP:"16000000" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.lib" /MACHINE:X86 Debug\MainWindow.res
          Debug\moc_mainwindow.obj
          Debug\moc_MyScene.obj
+         Debug\moc_ParasDlg.obj
          Debug\moc_rect.obj
          Debug\moc_ScrollArea.obj
          Debug\qrc_mainwindow.obj
@@ -24,6 +23,8 @@
          Debug\MyScene.obj
          Debug\rect.obj
          Debug\ScrollArea.obj
+         Debug\ParasDlg.obj
+         Debug\XML.obj
          LINK : 没有找到 D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\\MainWindow.exe 或上一个增量链接没有生成它；正在执行完全链接
             正在创建库 D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.lib 和对象 D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.exp
          MainWindow.vcxproj -> D:\Study\VC++_project\ShowImage\MainWindow\Win32\Debug\MainWindow.exe
@@ -36,4 +37,4 @@
 
 生成成功。
 
-已用时间 00:00:02.82
+已用时间 00:00:03.61

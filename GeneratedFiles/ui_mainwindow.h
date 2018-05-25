@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Wed May 9 11:14:01 2018
+** Created: Tue May 22 19:03:46 2018
 **      by: Qt User Interface Compiler version 4.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -39,6 +39,8 @@ public:
     QAction *ReductionAction;
     QAction *NewROIAction;
     QAction *DeleteROIAction;
+    QAction *BrightnessAddAction;
+    QAction *SetParasAction;
     QWidget *centralWidget;
     QGridLayout *gridLayout_2;
     QTreeView *treeView;
@@ -72,6 +74,10 @@ public:
         NewROIAction->setObjectName(QString::fromUtf8("NewROIAction"));
         DeleteROIAction = new QAction(MainWindowClass);
         DeleteROIAction->setObjectName(QString::fromUtf8("DeleteROIAction"));
+        BrightnessAddAction = new QAction(MainWindowClass);
+        BrightnessAddAction->setObjectName(QString::fromUtf8("BrightnessAddAction"));
+        SetParasAction = new QAction(MainWindowClass);
+        SetParasAction->setObjectName(QString::fromUtf8("SetParasAction"));
         centralWidget = new QWidget(MainWindowClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         gridLayout_2 = new QGridLayout(centralWidget);
@@ -159,6 +165,9 @@ public:
         mainToolBar->addAction(ReductionAction);
         mainToolBar->addAction(NewROIAction);
         mainToolBar->addAction(DeleteROIAction);
+        mainToolBar->addAction(BrightnessAddAction);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(SetParasAction);
 
         retranslateUi(MainWindowClass);
 
@@ -193,8 +202,16 @@ public:
 #ifndef QT_NO_TOOLTIP
         DeleteROIAction->setToolTip(QApplication::translate("MainWindowClass", "\345\210\240\351\231\244ROI", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
+        BrightnessAddAction->setText(QApplication::translate("MainWindowClass", "\344\272\256\345\272\246\345\242\236\345\212\240", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        BrightnessAddAction->setToolTip(QApplication::translate("MainWindowClass", "\344\272\256\345\272\246\345\242\236\345\212\240", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
+        SetParasAction->setText(QApplication::translate("MainWindowClass", "\345\217\202\346\225\260\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_TOOLTIP
+        SetParasAction->setToolTip(QApplication::translate("MainWindowClass", "\345\217\202\346\225\260\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_TOOLTIP
         menu->setTitle(QApplication::translate("MainWindowClass", "\346\226\207\344\273\266", 0, QApplication::UnicodeUTF8));
-        menu_2->setTitle(QApplication::translate("MainWindowClass", "\346\211\223\345\274\200", 0, QApplication::UnicodeUTF8));
+        menu_2->setTitle(QApplication::translate("MainWindowClass", "\345\217\202\346\225\260\350\256\276\347\275\256", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

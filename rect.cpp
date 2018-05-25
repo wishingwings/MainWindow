@@ -1,9 +1,10 @@
 #include "rect.h"
 #include "MyScene.h"
 #include <QGraphicsItem>
-#include <QRectF>
-#include <QPointF>
 #include <QObject>
+#include <QPointF>
+#include <QRectF>
+#include <QStyleOptionGraphicsItem>
 
 
 
@@ -35,8 +36,14 @@ void Rect::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	
 	qDebug()<<"ItemIsPressed"<<endl;
 	setFocus();
-	setSelected(true);
-
+	if (event->button() == Qt::LeftButton)
+	{
+		
+		qDebug() << "Custom item left clicked with shift key.";
+		// 选中 item
+		setSelected(true);
+	}
+	
 	QGraphicsItem::mousePressEvent(event);  
 	
 }
@@ -76,10 +83,42 @@ QRectF Rect::boundingRect() const
  {
 	 //painter->drawRect(QRectF(-m_width/2,-m_height/2,m_width,m_height));
 	 QPen pen=painter->pen();
-	 pen.setWidth(2);
+	 pen.setWidth(1);
 	 pen.setColor(Qt::red); // 也可以这样设置绘制ROI边框颜色pen.setColor(QColor(0, 160, 230));
 	 painter->setPen(pen);
 	 painter->drawRect(QRectF (startPos,QSizeF(m_width,m_height)));
+
+	 
+		
+	 if (option->state & QStyle::State_Selected) {
+
+
+		 QGraphicsRectItem::paint(painter, option, widget);
+
+		 // 调用默认方法，进行原始绘制
+		// paint(painter, option, widget);
+		 option->state == QStyle::State_None; 
+
+		 //qreal itemPenWidth = pen.widthF();
+		 //const qreal pad = itemPenWidth / 2;
+		// const qreal penWidth = 0;
+
+		 // 边框区域颜色
+		 //QColor color = QColor(Qt::red);
+
+		 // 绘制实线
+		 //painter->setPen(QPen(color, penWidth, Qt::SolidLine));
+		 //painter->setBrush(Qt::NoBrush);
+		 //painter->drawRect(boundingRect().adjusted(pad, pad, -pad, -pad));
+
+		 // 绘制虚线
+		//painter->setPen(QPen(color, 0, Qt::DashLine));
+		//painter->setBrush(Qt::NoBrush);
+		//painter->drawRect(boundingRect().adjusted(pad, pad, -pad, -pad));
+	 }
+
+	 
+
  }
 
  QPainterPath Rect::shape()const{   

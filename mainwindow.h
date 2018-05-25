@@ -11,6 +11,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QAction>
 #include<QAbstractScrollArea>
+#include <QColor>
 #include <QCursor>
 #include <QDebug>
 #include <QDir>
@@ -51,14 +52,19 @@
 
 #include <QScrollArea>
 #include <QMessageBox>
-#include<QMenuBar>
+#include <QMenu>
+#include <QMenuBar>
 
-#include <gdal_priv.h>
-#include <gdal.h>
+#include "gdal_priv.h"
+#include  "gdal.h"
 #include "MyScene.h"
 #include "rect.h"
+#include "ParasDlg.h"
 #include "ScrollArea.h"
 #include "ui_mainwindow.h"
+#include "ui_ParasDlg.h"
+#include "XML.h"
+
 
 
 class MainWindow :public QMainWindow
@@ -147,6 +153,17 @@ private:
 	/// 判断是否显示RGB彩色图像  
 	/// </summary>  
 	bool m_showColor;
+	 
+	
+	QAction *openAction;
+	QAction *PanAction;
+	QAction *SetParasAction;//打开配置参数界面
+	QAction *MagnifyAction;
+	QAction *NewROIAction;
+	/// <summary>  
+	///  读取图像的QImage格式
+	/// </summary>  
+	QImage *img;
 
 	
 	/// <summary>  
@@ -154,6 +171,7 @@ private:
 	/// </summary>  
 	QList <GDALRasterBand*>*imgBand;
 
+	
 	///<summary>
 	///图像数据集
 	///</summary>
@@ -227,10 +245,7 @@ private:
 	QTreeView *treeView;
 
 
-	QAction *openAction;
-	QAction *PanAction;
-	QAction *MagnifyAction;
-	QAction *NewROIAction;
+
 	///<summary>
 	///光标对象
 	///用于graphicsview的光标
@@ -250,10 +265,20 @@ private:
 	/// </summary>  
 	QStandardItemModel *imgMetaModel;  
 	Ui::MainWindowClass ui;
+	ParasDlg *parasDlg;
+
+	
+	// <summary> 
+	/// 图像亮度增加  
+	/// </summary>  
+	QImage* BrightnessAdd(QImage *origin);
+
 	double CalScaleFactor(double maxLatitude,double minLatitude,double maxLongtitude,double minLongtitude,int widthGraphicsView,int heightGraphicsView);
 
 	bool eventFilter(QObject *o, QEvent *e);
 	void InitTree();//初始化左侧树
+
+	
 	
 	void ShowBand(GDALRasterBand* band );  
 		
@@ -292,6 +317,9 @@ signals:
 	
 private slots:
 	void openFileSlot();
+	
+	//弹出设置参数界面的槽
+	void setParasSlot();
 	
 	//工具栏-图像漫游的槽
 	void panPicSlot();

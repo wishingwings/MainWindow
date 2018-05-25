@@ -121,8 +121,10 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 		BackgroundXMoveList.append(MainWindow::hScrollBarNow);//记录绘制ROI时候，场景移动的X距离
 		BackgroundYMoveList.append(MainWindow::vScrollBarNow);//记录绘制ROI时候，场景移动的Y距离
 				
+		rect->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 		this->addItem(rect);
 		
+
 		tmpROILists->append(rect);
 	
 		qDebug()<<"primative RECT TP"<<rect->boundingRect().topLeft();
@@ -255,6 +257,9 @@ void MyScene::RedrawROI(int i)
 		this->removeItem(tmpROILists->at(i));
 	}
 	qDebug()<<"scene items count now"<<this->items().count();
+
+	NewRectItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+
 	NewRectItem->setPen(pen);
 	this->addItem(NewRectItem);
 	

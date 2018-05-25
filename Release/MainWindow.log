@@ -1,0 +1,44 @@
+﻿生成启动时间为 5/16/2018 9:58:11 PM。
+     1>项目“D:\Study\VC++_project\ShowImage\MainWindow\MainWindow\MainWindow.vcxproj”在节点 2 上(build 个目标)。
+     1>InitializeBuildStatus:
+         正在对“Release\MainWindow.unsuccessfulbuild”执行 Touch 任务。
+       CustomBuild:
+         所有输出均为最新。
+       ClCompile:
+         所有输出均为最新。
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I.\GeneratedFiles /I. /ID:\Install\QT4.8\include /I.\GeneratedFiles\Release /ID:\Install\QT4.8\include\QtCore /ID:\Install\QT4.8\include\QtGui /ID:\Install\QT4.8\include\QtXml /nologo /W1 /WX- /O2 /Oy- /D UNICODE /D WIN32 /D QT_LARGEFILE_SUPPORT /D QT_DLL /D QT_NO_DEBUG /D NDEBUG /D QT_CORE_LIB /D QT_GUI_LIB /D QT_XML_LIB /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt GeneratedFiles\Release\moc_mainwindow.cpp GeneratedFiles\Release\moc_MyScene.cpp main.cpp mainwindow.cpp MyScene.cpp rect.cpp
+         moc_mainwindow.cpp
+         moc_MyScene.cpp
+         main.cpp
+         mainwindow.cpp
+         MyScene.cpp
+         rect.cpp
+     1>rect.cpp(100): warning C4553: “==”: 运算符不起任何作用；是否是有意使用“=”的?
+         正在生成代码...
+       ResourceCompile:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /l"0x0409" /nologo /fo"Release\MainWindow.res" MainWindow.rc 
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Release\\MainWindow.exe" /NOLOGO /LIBPATH:D:\Install\QT4.8\lib gdal_i.lib qtmain.lib QtCore4.lib QtGui4.lib QtXml4.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\MainWindow.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Release\MainWindow.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Release\MainWindow.lib" /MACHINE:X86 Release\MainWindow.res
+         Release\qrc_mainwindow.obj
+         Release\moc_mainwindow.obj
+         Release\moc_MyScene.obj
+         Release\moc_rect.obj
+         Release\moc_ScrollArea.obj
+         Release\main.obj
+         Release\mainwindow.obj
+         Release\MyScene.obj
+         Release\rect.obj
+         Release\ScrollArea.obj
+         Release\XML.obj
+            正在创建库 D:\Study\VC++_project\ShowImage\MainWindow\Win32\Release\MainWindow.lib 和对象 D:\Study\VC++_project\ShowImage\MainWindow\Win32\Release\MainWindow.exp
+         MainWindow.vcxproj -> D:\Study\VC++_project\ShowImage\MainWindow\Win32\Release\MainWindow.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"D:\Study\VC++_project\ShowImage\MainWindow\Win32\Release\\MainWindow.exe;#1" /manifest Release\MainWindow.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         正在删除文件“Release\MainWindow.unsuccessfulbuild”。
+         正在对“Release\MainWindow.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“D:\Study\VC++_project\ShowImage\MainWindow\MainWindow\MainWindow.vcxproj”(build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:07.48

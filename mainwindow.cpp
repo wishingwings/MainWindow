@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 #include "MyScene.h" //为了引用全局变量QList ROILists
-#include "rect.h"
 #include "gdal.h"
 #include "gdal_priv.h"
+#include "rect.h"
+
 
 //接收的变量
 static double dGeoPosX; //MyScene中鼠标所在点的地理坐标X 初始化
@@ -34,6 +35,11 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	ui.setupUi(this);
 	setWindowState(Qt::WindowMaximized);//使得窗口最大化
 	//计算显示图像的区域
+	SetParasAction=new QAction(this);
+	
+	ui.menuBar->addAction(SetParasAction);
+
+		
 
 	vScrollBarNow=ui.graphicsView->verticalScrollBar()->value();
 	hScrollBarNow=2;
@@ -54,7 +60,10 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	myScene=new MyScene(this);
 	
 	qDebug()<<myScene->sceneRect()<<endl;
-	
+	 XML xml;
+	 xml.ReadXML();
+
+	 xml.UpdateXML();
 	 LabelGeoXY = new QLabel(this);
 
 	
@@ -78,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	QToolBar *pToolBar=addToolBar(tr("&File"));
 		
 	QObject::connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openFileSlot()));
+
+	QObject::connect(ui.SetParasAction,SIGNAL(triggered()),this,SLOT(setParasSlot()));
    	
 	QObject::connect(ui.PanAction,SIGNAL(triggered()),this,SLOT(panPicSlot()));
 		
@@ -94,18 +105,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 	QObject::connect(vScrollBar,SIGNAL(valueChanged(int)),this,SLOT(VerticalScrollBarValueChangedSlot(int)));
 
 	QObject::connect(hScrollBar,SIGNAL(valueChanged(int)),this,SLOT(HorizontalScrollBarValueChangedSlot(int)));
-
-	//QObject::connect(myScene,SIGNAL(sendData(int X,int Y)), this, SLOT(ReceiveDataSlot(int X,int Y)));
-	//QObject::connect(this,SIGNAL(sliderPressed()),this,SLOT(valueChangedSlot(int)));
-
-	//QObject::connect(rect,SIGNAL(itemIsPressed()),this,SLOT(isPressed()));  //FIXME
-	//QObject::connect(rect,SIGNAL(itemIsReleased()),this,SLOT(isReleased()));//FIXME
-
-
-	//QObject::connect(this,SIGNAL(RectMouseIsPressed()),this,SLOT(mousePressEventSlot()));
-
-	//QObject::connect(this,SIGNAL(released()),this,SLOT(mouseReleaseEvent()));
-		
+	
 }
 
 MainWindow::~MainWindow()
@@ -114,12 +114,25 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::resizeEvent() 
+QImage* MainWindow::BrightnessAdd(QImage *origin)
 {
-	ui.graphicsView->size();
-	int widthGraphicsView=ui.graphicsView->size().width();
-	int heightGraphicsView=ui.graphicsView->size().height();
+	QImage * newImage = new QImage(origin->width(),origin->height(),QImage::Format_Indexed8);
 
+	QRgb * line;  
+
+	for(int y = 0; y<newImage->height(); y++){  
+		QRgb * line = (QRgb *)origin->scanLine(y);  
+
+		for(int x = 0; x<newImage->width(); x++){  
+			int average = (qRed(line[x]) + qGreen(line[x]) + qRed(line[x]))/3;  
+			newImage->setPixel(x,y, qRgb(average, average, average));  
+		}  
+
+	}  
+
+	return newImage;  
+	
+	
 }
 
 void MainWindow::ReadImgInfo(QString fileName)
@@ -223,7 +236,7 @@ void MainWindow::VerticalScrollBarValueChangedSlot(int value)
 			pItem1=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8)));
 
 			pItem1->setPos(hScrollBarNow,value);//设置新建item1的左上角点
-			//pItem1->scale(scaleFactor,scaleFactor);
+			
 			qDebug()<<"pItem1 height"<<pItem1->boundingRect().height();
 			qDebug()<<"pItem1 width"<<pItem1->boundingRect().width();
 			qDebug()<<"pitem1 rect TL"<<pItem1->sceneBoundingRect().topLeft();
@@ -238,49 +251,10 @@ void MainWindow::VerticalScrollBarValueChangedSlot(int value)
 			  qDebug()<<"pitem1 rect TR"<<pItem1->sceneBoundingRect().topRight();
 			  qDebug()<<"pitem1 rect BL"<<pItem1->sceneBoundingRect().bottomLeft();
 			  qDebug()<<"pitem1 rect BR"<<pItem1->sceneBoundingRect().bottomRight();
-			/*QImage img=QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8);
-			
-				
-			qDebug()<<"pixmap height"<<img.height();
-			qDebug()<<"pixmap width"<<img.width();
-			
-			QPixmap redrawPixmap(widthGraphicsView,heightGraphicsView);
-
-			QPainter painter(&redrawPixmap);
-			painter.drawPixmap(x,y,widthGraphicsView,heightGraphicsView,QPixmap::fromImage(img));
-			painter.end();
-			
-			QGraphicsPixmapItem *pBackImg=new QGraphicsPixmapItem(redrawPixmap);
-			
-			pBackImg->setPos(x,y);	
-			
-			qDebug()<<"pBackImg height"<<pBackImg->boundingRect().height();
-			qDebug()<<"pBackImg width"<<pBackImg->boundingRect().width();
 		
-			pitem1TL.setX(int(hScrollBarNow/scaleFactor));
-			pitem1TL.setY(int(value/scaleFactor));
-			int vBarValuebefore=ui.graphicsView->verticalScrollBar()->height();
-			qDebug()<<"vbar max "<<vBarValuebefore;
-			qDebug()<<"pitem1 rect TL"<<pItem1->sceneBoundingRect().topLeft();
-			qDebug()<<"pitem1 rect TR"<<pItem1->sceneBoundingRect().topRight();
-			qDebug()<<"pitem1 rect BL"<<pItem1->sceneBoundingRect().bottomLeft();
-			qDebug()<<"pitem1 rect BR"<<pItem1->sceneBoundingRect().bottomRight();
-			//currMatrix记录最近的pItem1放大的倍数
-			//pItem1->setMatrix(currMatrix);
-
-			int vBarValue=ui.graphicsView->verticalScrollBar()->height();
-			qDebug()<<"vbar max "<<vBarValue;
-			qDebug()<<"pitem1 rect TL"<<pBackImg->sceneBoundingRect().topLeft();
-			qDebug()<<"pitem1 rect TR"<<pBackImg->sceneBoundingRect().topRight();
-			qDebug()<<"pitem1 rect BL"<<pBackImg->sceneBoundingRect().bottomLeft();
-			qDebug()<<"pitem1 rect BR"<<pBackImg->sceneBoundingRect().bottomRight();*/
-			//增加重绘在MyScene的矩形
-			//QGraphicsRectItem *rectItemRedraw=new QGraphicsRectItem();
 			qDebug()<<"ROILists count"<<myScene->ROILists->count();
 			
-			//把pitem1加入itemGroup
-			//myScene->itemGroup->addToGroup(pItem1);
-			//myScene->addItem(myScene->itemGroup);
+			
 			myScene->addItem(pItem1);
 			
 			qDebug()<<"myScene items count"<<myScene->items().count();
@@ -291,18 +265,13 @@ void MainWindow::VerticalScrollBarValueChangedSlot(int value)
 				{
 					myScene->RedrawROI(i);
 					qDebug()<<"myScene items count"<<myScene->items().count();
-									
-					
+										
 				}
 			}
 			
-		
-		
 			qDebug()<<"myScene's including items"<<myScene->items().count();
 			ui.graphicsView->setScene(myScene);
 
-
-	
 		}
 
 	}
@@ -331,25 +300,7 @@ void MainWindow::HorizontalScrollBarValueChangedSlot(int value)
 		}
 		else
 		{
-		/*	GDALRasterBand  *poBand1;
-
-			int bytePerLine = (widthGraphicsView * 8 + 31 )/ 32*4;  
-			unsigned char* allBandUC = new unsigned char[bytePerLine * heightGraphicsView]; 
-			poBand1=poDataset->GetRasterBand(1);
-			
-			poBand1 ->RasterIO(GF_Read,value,vScrollBarNow, widthGraphicsView,heightGraphicsView,allBandUC ,widthGraphicsView,heightGraphicsView, GDT_Byte, 0, 0);
-			pItem1=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8)));
-			pItem1->setPos(value,vScrollBarNow);//设置新建item的左上角点
-			myScene->addItem(pItem1);
-			pItem1->setMatrix(currMatrix);
-
-			if(myScene->ROILists->count()!=0)
-			{
-				for(int i=0;i<myScene->ROILists->count();i++)
-				{
-					myScene->RedrawROI(i);
-				}
-			}*/
+		
 
 			qDebug()<<"myScene's including items"<<myScene->items().count();
 			ui.graphicsView->setScene(myScene);
@@ -455,7 +406,7 @@ void MainWindow::ReadImg(QString fileName,int myScenedistX,int myScenedistY)
 	
 	poBand->RasterIO(GF_Read,0,0, widthGraphicsView, heightGraphicsView,allBandUC ,widthGraphicsView, heightGraphicsView, GDT_Byte, 0, 0);
 
-//	GDALClose(poDataset);
+    img=new QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8);
 	pItem=new QGraphicsPixmapItem( QPixmap::fromImage(QImage(allBandUC,widthGraphicsView,heightGraphicsView,QImage::Format_Indexed8)));
 	
 	qDebug()<<"pItem height"<<pItem->boundingRect().height();
@@ -726,27 +677,15 @@ void MainWindow::mousePressEventSlot()
 
 	
 }
-//<summary>  
-///图像上的点坐标转化成Scene上的点坐标
-///</summary>  
-///<param name="event">鼠标左键事件</param> 
 
-void MainWindow::ImgPtChangedScenePt()
+void MainWindow::setParasSlot()
 {
 	
+	 parasDlg=new ParasDlg(this);
+     parasDlg->show();
 
-};
-//<summary>  
-///图像上的点坐标转化成Scene上的点坐标
-///</summary>  
-///<param name="event">鼠标左键事件</param> 
-
-void MainWindow::ScenePtChangedImgPt()
-{
-
-
-};
-
+	 
+}
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event)
 {

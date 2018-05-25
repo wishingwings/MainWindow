@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Wed May 9 13:43:04 2018
+** Created: Tue May 22 19:22:59 2018
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_MainWindow[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      16,   14, // methods
+      17,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -40,15 +40,16 @@ static const uint qt_meta_data_MainWindow[] = {
  // slots: signature, parameters, type, tag, flags
       77,   11,   11,   11, 0x08,
       92,   11,   11,   11, 0x08,
-     105,   11,   11,   11, 0x08,
-     125,   11,   11,   11, 0x08,
-     144,   11,   11,   11, 0x08,
-     166,   11,   11,   11, 0x08,
-     179,   11,   11,   11, 0x08,
-     218,   11,   11,   11, 0x08,
-     259,   11,   11,   11, 0x08,
-     271,   11,   11,   11, 0x08,
-     284,   11,   11,   11, 0x08,
+     107,   11,   11,   11, 0x08,
+     120,   11,   11,   11, 0x08,
+     140,   11,   11,   11, 0x08,
+     159,   11,   11,   11, 0x08,
+     181,   11,   11,   11, 0x08,
+     194,   11,   11,   11, 0x08,
+     233,   11,   11,   11, 0x08,
+     274,   11,   11,   11, 0x08,
+     286,   11,   11,   11, 0x08,
+     299,   11,   11,   11, 0x08,
 
        0        // eod
 };
@@ -56,10 +57,10 @@ static const uint qt_meta_data_MainWindow[] = {
 static const char qt_meta_stringdata_MainWindow[] = {
     "MainWindow\0\0clicked()\0released()\0"
     "timeout()\0sliderPressed()\0valueChanged(int)\0"
-    "openFileSlot()\0panPicSlot()\0"
-    "MagnifyActionSlot()\0NewROIActionSlot()\0"
-    "DeleteROIActionSlot()\0timeUpdate()\0"
-    "VerticalScrollBarValueChangedSlot(int)\0"
+    "openFileSlot()\0setParasSlot()\0"
+    "panPicSlot()\0MagnifyActionSlot()\0"
+    "NewROIActionSlot()\0DeleteROIActionSlot()\0"
+    "timeUpdate()\0VerticalScrollBarValueChangedSlot(int)\0"
     "HorizontalScrollBarValueChangedSlot(int)\0"
     "isPressed()\0isReleased()\0mousePressEventSlot()\0"
 };
@@ -76,16 +77,17 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 3: _t->sliderPressed(); break;
         case 4: _t->valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 5: _t->openFileSlot(); break;
-        case 6: _t->panPicSlot(); break;
-        case 7: _t->MagnifyActionSlot(); break;
-        case 8: _t->NewROIActionSlot(); break;
-        case 9: _t->DeleteROIActionSlot(); break;
-        case 10: _t->timeUpdate(); break;
-        case 11: _t->VerticalScrollBarValueChangedSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 12: _t->HorizontalScrollBarValueChangedSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 13: _t->isPressed(); break;
-        case 14: _t->isReleased(); break;
-        case 15: _t->mousePressEventSlot(); break;
+        case 6: _t->setParasSlot(); break;
+        case 7: _t->panPicSlot(); break;
+        case 8: _t->MagnifyActionSlot(); break;
+        case 9: _t->NewROIActionSlot(); break;
+        case 10: _t->DeleteROIActionSlot(); break;
+        case 11: _t->timeUpdate(); break;
+        case 12: _t->VerticalScrollBarValueChangedSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 13: _t->HorizontalScrollBarValueChangedSlot((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 14: _t->isPressed(); break;
+        case 15: _t->isReleased(); break;
+        case 16: _t->mousePressEventSlot(); break;
         default: ;
         }
     }
@@ -123,9 +125,9 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 16)
+        if (_id < 17)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 16;
+        _id -= 17;
     }
     return _id;
 }
